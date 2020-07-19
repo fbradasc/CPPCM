@@ -1,4 +1,5 @@
 Combined Pulse Position Coded Modulation (CPPCM) Receiver Library for Arduino
+       - PLEASE DO NOT USE - WORK IN PROGRESS - PLEASE DO NOT USE -
 =============================================================================
 
 This library provides a simple interface for reading
