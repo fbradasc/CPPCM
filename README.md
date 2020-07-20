@@ -1,9 +1,11 @@
-Combined Pulse Position Coded Modulation (CPPCM) Receiver Library for Arduino
-       - PLEASE DO NOT USE - WORK IN PROGRESS - PLEASE DO NOT USE -
+CPPCM-DSR
+(Combined Pulse Position Coded Modulation - Dgital Signature Recongnition)
+Library for Arduino
+- PLEASE DO NOT USE - WORK IN PROGRESS - PLEASE DO NOT USE -
 =============================================================================
 
-This library provides a simple interface for reading
-up to 16 channels of RC input from a single CPPCM signal:
+This library provides a simple interface for reading and validating up to 16
+channels of RC input from a single CPPCM signal:
 
     void setup(void)
     {
@@ -26,6 +28,14 @@ up to 16 channels of RC input from a single CPPCM signal:
         }
     }
 
-In its current form, it most likely only works on Arduino Uno. It requires
-exclusive access to timer1, preventing the use of PWM on digital output pins
-9 & 10 (whose waveform generator also use timer1).
+It analyse the data stream and automatically checks for:
+
+- positive or negative shift
+- valid number of pulses (autodetects and stores this)
+- valid frame length
+- valid pulse widths
+- valid channel gap widths
+- valid sync gap widths
+
+The term "Code" in the project name means the pulse widths can be used to
+superimpose to each frame a digital code of up to 2*(channels+1) bits.

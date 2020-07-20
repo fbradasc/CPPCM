@@ -13,13 +13,13 @@
 
 ISR(TIMER1_CAPT_vect);
 
-class CPPCMReader
+class CPPCMDsr
 {
 public:
-    CPPCMReader()
-        : _search(true )
-        , _synced(false)
-        , _state (false)
+    CPPCMDsr()
+        : _search    (true )
+        , _synced    (false)
+        , _breaks_level(false) // PPM with positive shift by default
     {
     }
 
@@ -35,11 +35,11 @@ private:
     uint8_t           _channels;
     volatile bool     _search;
     volatile bool     _synced;
-    volatile bool     _state;
-    volatile int16_t  _values[CPPCM_MAX_CHANNELS];
+    volatile bool     _breaks_level;
+    volatile int16_t  _breaks[CPPCM_MAX_CHANNELS];
     volatile int16_t  _pulses[CPPCM_MAX_CHANNELS];
 };
 
-extern CPPCMReader CPPCM;
+extern CPPCMDsr CPPCM;
 
 #endif

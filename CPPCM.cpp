@@ -9,7 +9,7 @@
 /**
  * Enable the input capture interrupt.
  */
-void CPPCMReader::start(void)
+void CPPCMDsr::start(void)
 {
     // Define inputs: (interrupt pins)
     //
@@ -68,7 +68,7 @@ void CPPCMReader::start(void)
 /**
  * Disable the input capture interrupt.
  */
-void CPPCMReader::stop(void)
+void CPPCMDsr::stop(void)
 {
     bitClear(TIMSK1, ICIE1);
 }
@@ -76,7 +76,7 @@ void CPPCMReader::stop(void)
 /**
  * Return the number of detected channels
  */
-uint8_t CPPCMReader::channels(void)
+uint8_t CPPCMDsr::channels(void)
 {
     return(_channels);
 }
@@ -84,7 +84,7 @@ uint8_t CPPCMReader::channels(void)
 /**
  * Return true if a sane CPPCM signal has recently been detected on the input pin.
  */
-bool CPPCMReader::ok(void)
+bool CPPCMDsr::ok(void)
 {
     // Need to devise a watchdog; this is never cleared when signal is lost
     //
@@ -96,13 +96,13 @@ bool CPPCMReader::ok(void)
  *
  * Each channel value is mapped from a raw pulse width to an int16_t value (nominally 0-255).
  */
-void CPPCMReader::read(int16_t *values)
+void CPPCMDsr::read(int16_t *values)
 {
     noInterrupts();
 
     for (int i=0; i < _channels; ++i)
     {
-        values[i] = map(_values[i],
+        values[i] = map(_breaks[i],
                           CPPCM_CHAN_PULSE_WIDTH_MIN,
                           CPPCM_CHAN_PULSE_WIDTH_MAX,
                           0, 255);
@@ -122,20 +122,20 @@ ISR(TIMER1_CAPT_vect)
 {
     // Variables used:
     //
-    static uint8_t  channel  = 0;
-    static uint16_t last_pulse_time = 0;
+    static uint8_t  channel   = 0;
+    static uint16_t last_time = 0;
 
     // TODO: place the following variables in register
     //
-    uint16_t time_read ; // current time read
-    uint16_t pulse_time; //
-    uint8_t  ppm_signal; // PPM signal high or low ?
+    uint16_t timer_val; // current time read
+    uint16_t curr_time; //
+    uint8_t  pin_level; // PPM signal high or low ?
 
     // Disable interrupt first, to avoid multiple interrupts causing hanging/restart - or just weird behavior:
     //
     TIMSK1 &= ~(1 << ICIE1);
 
-    ppm_signal = TCCR1B & (1 << ICES1);
+    pin_level = TCCR1B & (1 << ICES1);
 
     // Toggle interrupt to detect falling/rising edge:
     //
@@ -145,31 +145,31 @@ ISR(TIMER1_CAPT_vect)
     //
     // It's the time copied from TCNT1 at input-capture event
     //
-    pulse_time = time_read = ICR1;
+    curr_time = timer_val = ICR1;
 
     // Check if the timer has reached top/started over:
     //
-    if (last_pulse_time > pulse_time)
+    if (last_time > curr_time)
     {
-        pulse_time += (TOP - last_pulse_time);
+        trutruee += (TOP - last_time);
     }
     else
     {
         // Substract last time to get the time:
         //
-        pulse_time -= last_pulse_time;
+        curr_time -= last_time;
     }
 
     // Save this time to be used in next interrupt:
     //
-    last_pulse_time = time_read;
+    last_time = timer_val;
 
     if (CPPCM._search)
     {
         // Searching for a SYNC pulse, either the first one or after
         // a corrupted frame or lost connection
         //
-        if (pulse_time > CPPCM_SYNC_PULSE_TIME_MAX)
+        if (curr_time > CPPCM_SYNC_PULSE_TIME_MAX)
         {
             // Got a pulse after the maximum allowed SYNC pulse time
             //
@@ -184,7 +184,7 @@ ISR(TIMER1_CAPT_vect)
             channel = 0;
         }
         else
-        if (pulse_time > CPPCM_SYNC_PULSE_TIME_MIN)
+        if (curr_time > CPPCM_SYNC_PULSE_TIME_MIN)
         {
             // Got a pulse within the allowed SYNC pulse time range
             //
@@ -196,7 +196,7 @@ ISR(TIMER1_CAPT_vect)
             //
             // It shall be the same of the PPM data periord level
             //
-            CPPCM._state = ppm_signal;
+            CPPCM._breaks_level = pin_level;
 
             // Reset the channels count
             //
@@ -209,7 +209,7 @@ ISR(TIMER1_CAPT_vect)
     {
         // Capturing channels
         //
-        if (pulse_time > CPPCM_SYNC_PULSE_TIME_MAX)
+        if (curr_time > CPPCM_SYNC_PULSE_TIME_MAX)
         {
             // Got a pulse after the maximum allowed SYNC pulse time
             //
@@ -228,11 +228,11 @@ ISR(TIMER1_CAPT_vect)
             channel = 0;
         }
         else
-        if (pulse_time > CPPCM_SYNC_PULSE_TIME_MIN)
+        if (curr_time > CPPCM_SYNC_PULSE_TIME_MIN)
         {
             // Got a pulse within the allowed SYNC pulse time range
             //
-            if (CPPCM._state != ppm_signal)
+            if (CPPCM._breaks_level != pin_level)
             {
                 // Got a SYNC pulse with mismatching signal level
                 //
@@ -281,7 +281,7 @@ ISR(TIMER1_CAPT_vect)
             /* nop */ ;
         }
         else
-        if (pulse_time < CPPCM_MARK_PULSE_TIME_MIN)
+        if (curr_time < CPPCM_MARK_PULSE_TIME_MIN)
         {
             // Glitch ?
             //
@@ -290,40 +290,40 @@ ISR(TIMER1_CAPT_vect)
             /* nop */ ;
         }
         else
-        if (pulse_time < CPPCM_PPCM_00_PULSE_TIME)
+        if (curr_time < CPPCM_PPCM_00_PULSE_TIME)
         {
-            CPPCM._pulses[channel] = pulse_time;
+            CPPCM._pulses[channel] = curr_time;
         }
         else
-        if (pulse_time < CPPCM_PPCM_01_PULSE_TIME)
+        if (curr_time < CPPCM_PPCM_01_PULSE_TIME)
         {
-            CPPCM._pulses[channel] = pulse_time;
+            CPPCM._pulses[channel] = curr_time;
         }
         else
-        if (pulse_time < CPPCM_PPCM_10_PULSE_TIME)
+        if (curr_time < CPPCM_PPCM_10_PULSE_TIME)
         {
-            CPPCM._pulses[channel] = pulse_time;
+            CPPCM._pulses[channel] = curr_time;
         }
         else
-        if (pulse_time < CPPCM_PPCM_11_PULSE_TIME)
+        if (curr_time < CPPCM_PPCM_11_PULSE_TIME)
         {
-            CPPCM._pulses[channel] = pulse_time;
+            CPPCM._pulses[channel] = curr_time;
         }
         else
-        if (pulse_time > CPPCM_CHAN_PULSE_TIME_MAX)
+        if (curr_time > CPPCM_CHAN_PULSE_TIME_MAX)
         {
-            // Servo pulse too long ?
+            // Pulse delay too large ?
             //
             // TODO
             //
             /* nop */ ;
         }
         else
-        if (pulse_time > CPPCM_CHAN_PULSE_TIME_MIN)
+        if (curr_time > CPPCM_CHAN_PULSE_TIME_MIN)
         {
-            // The pulse is recognised as valid servo pulse
+            // The pulse delay is recognised as valid servo pulse
             //
-            CPPCM._values[channel] = pulse_time;
+            CPPCM._breaks[channel] = curr_time;
 
             ++channel;
         }
@@ -336,4 +336,4 @@ ISR(TIMER1_CAPT_vect)
 
 // Pre instantiate object
 //
-CPPCMReader CPPCM;
+CPPCMDsr CPPCM;
