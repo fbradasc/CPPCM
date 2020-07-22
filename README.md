@@ -32,14 +32,17 @@ The term *Code* in the project name means the pulse widths can be used to
 superimpose to each frame a digital code of up to 2*(channels+1) bits.
 
 The width of each pulse is 0.3 to 0.45 mS (300 to 450uS). (TODO: code superimposition)
+
 The width of each channel is 1 to 2mS (1.5mS when sticks centered).
+
 The sync gap is at least 2.5mS long.
+
 An N channels frame length is approximately (2*N+2.5)mS.
 
 The input signal should look something like this for a **positive** *shift*:
 
                 |<-------------- 1 frame at least ~(2*N+2.5)mS ------------->|
-                |< 1~2mS >|     300~450uS -->| |<--       |< at least 2.5mS >|
+                |< 1~2mS >|     300~450uS -->| |<--     |<  at least 2.5mS  >|
                  _         _                  _          _                    _
                 | |       | |                | |        | |                  | |    
      ___________| |_______| |_________ // ___| |________| |__________________| |____
@@ -48,7 +51,7 @@ The input signal should look something like this for a **positive** *shift*:
 Or like this for a **negative** *shift*:
 
                 |<-------------- 1 frame at least ~(2*N+2.5)mS ------------->|
-                |< 1~2mS >|     300~450uS -->| |<--       |< at least 2.5mS >|
+                |< 1~2mS >|     300~450uS -->| |<--     |<  at least 2.5mS  >|
      ___________. ._______. ._________ // ___. .________. .__________________. .____
                 | |       | |                | |        | |                  | |
                 |_|       |_|                |_|        |_|                  |_|
