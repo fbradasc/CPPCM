@@ -1,7 +1,7 @@
 CPPCM-DSR - Library for Arduino
 =============================================================================
-** (Combined Pulse Position Coded Modulation - Dgital Signature Recongnition) **
-** PLEASE DO NOT USE - WORK IN PROGRESS - PLEASE DO NOT USE **
+**(Combined Pulse Position Coded Modulation - Dgital Signature Recongnition)**
+**-- PLEASE DO NOT USE - WORK IN PROGRESS - PLEASE DO NOT USE --**
 
 
 
