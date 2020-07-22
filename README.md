@@ -1,8 +1,9 @@
-CPPCM-DSR
+CPPCM-DSR - Library for Arduino
 =============================================================================
-(Combined Pulse Position Coded Modulation - Dgital Signature Recongnition)
-Library for Arduino
-- PLEASE DO NOT USE - WORK IN PROGRESS - PLEASE DO NOT USE -
+** (Combined Pulse Position Coded Modulation - Dgital Signature Recongnition) **
+** PLEASE DO NOT USE - WORK IN PROGRESS - PLEASE DO NOT USE **
+
+
 
 
 This library provides a simple interface to read and validate CPPM frames of
