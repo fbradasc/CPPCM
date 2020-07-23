@@ -41,21 +41,21 @@ An N channels frame length is approximately (2*N+2.5)mS.
 
 The input signal should look something like this for a **positive** *shift*:
 
-                |<-------------- 1 frame at least ~(2*N+2.5)mS ------------->|
-                |< 1~2mS >|     300~450uS -->| |<--     |<  at least 2.5mS  >|
-                 _         _                  _          _                    _
-                | |       | |                | |        | |                  | |    
-     ___________| |_______| |_________ // ___| |________| |__________________| |____
-      sync gap      ch1        ch2    etc.        chN          sync gap          ch1
+               |<-------------- 1 frame at least ~(2*N+2.5)mS ------------->|
+               |< 1~2mS >|     300~450uS -->| |<--     |<  at least 2.5mS  >|
+                _         _                  _          _                    _
+               | |       | |                | |        | |                  | |    
+     __________| |_______| |_________ // ___| |________| |__________________| |____
+      sync gap     ch1        ch2    etc.        chN          sync gap          ch1
 
 Or like this for a **negative** *shift*:
 
-                |<-------------- 1 frame at least ~(2*N+2.5)mS ------------->|
-                |< 1~2mS >|     300~450uS -->| |<--     |<  at least 2.5mS  >|
-     ___________. ._______. ._________ // ___. .________. .__________________. .____
-                | |       | |                | |        | |                  | |
-                |_|       |_|                |_|        |_|                  |_|
-      sync gap       ch1       ch2    etc.        chN          sync gap          ch1
+               |<-------------- 1 frame at least ~(2*N+2.5)mS ------------->|
+               |< 1~2mS >|     300~450uS -->| |<--     |<  at least 2.5mS  >|
+     __________. ._______. ._________ // ___. .________. .__________________. .____
+               | |       | |                | |        | |                  | |
+               |_|       |_|                |_|        |_|                  |_|
+      sync gap      ch1       ch2    etc.        chN          sync gap          ch1
 
 ## FRAME VALIDATION
 

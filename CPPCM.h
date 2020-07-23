@@ -4,12 +4,7 @@
 #include <inttypes.h>
 #include <avr/interrupt.h>
 
-#define ICP1                         8 // Input capture pin 1
-#define CPPCM_MAX_CHANNELS           16
-#define CPPCM_SYNC_PULSE_TIME_MIN  3600 // Minimum tolerable value - TDB
-#define CPPCM_SYNC_PULSE_TIME_MAX 50000 // Maximum tolerable value - TDB
-#define CPPCM_CHAN_PULSE_TIME_MIN  1000 // Minimum tolerable value - TDB
-#define CPPCM_CHAN_PULSE_TIME_MAX  1000 // Minimum tolerable value - TDB
+#define CPPCM_MAX_CHANNELS  16
 
 ISR(TIMER1_CAPT_vect);
 
@@ -17,9 +12,10 @@ class CPPCMDsr
 {
 public:
     CPPCMDsr()
-        : _search    (true )
-        , _synced    (false)
-        , _breaks_level(false) // PPM with positive shift by default
+        : _buffer      (0)
+        , _search      (true )
+        , _synced      (false)
+        , _signal_level(false) // PPM with positive shift by default
     {
     }
 
@@ -33,10 +29,11 @@ public:
 
 private:
     uint8_t           _channels;
+    volatile uint8_t  _buffer;
     volatile bool     _search;
     volatile bool     _synced;
-    volatile bool     _breaks_level;
-    volatile int16_t  _breaks[CPPCM_MAX_CHANNELS];
+    volatile bool     _signal_level;
+    volatile int16_t  _servos[2][CPPCM_MAX_CHANNELS];
     volatile int16_t  _pulses[CPPCM_MAX_CHANNELS];
 };
 
