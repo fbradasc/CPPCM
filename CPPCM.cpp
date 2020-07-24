@@ -8,14 +8,14 @@
 #define CHANNEL_WIDTH_MIN_US    1000
 #define CHANNEL_WIDTH_MAX_US    2000
 #define PULSE_WIDTH_MIN_US       300
-#define PULSE_WIDTH_MAX_US       450
+#define PULSE_WIDTH_MAX_US      (CHANNEL_WIDTH_MIN_US-PULSE_WIDTH_MIN_US-2*GUARD_US)
 #define SYNC_WIDTH_MIN_US       2500
 
 #define PULSE_WIDTH_MIN     US_TO_TICKS(PULSE_WIDTH_MIN_US-GUARD_US)
 #define PULSE_WIDTH_MAX     US_TO_TICKS(PULSE_WIDTH_MAX_US+GUARD_US)
-#define GAP_WIDTH_MIN       US_TO_TICKS(CHANNEL_WIDTH_MIN_US-GUARD_US)-PULSE_WIDTH_MAX
-#define GAP_WIDTH_MAX       US_TO_TICKS(CHANNEL_WIDTH_MAX_US+GUARD_US)-PULSE_WIDTH_MIN
-#define SYNC_WIDTH_MAX      US_TO_TICKS(((CHANNEL_WIDTH_MAX_US+GUARD_US)*(CPPCM_MAX_CHANNELS-1))+SYNC_WIDTH_MIN_US)
+#define GAP_WIDTH_MIN       US_TO_TICKS(CHANNEL_WIDTH_MIN_US-PULSE_WIDTH_MAX_US-GUARD_US)
+#define GAP_WIDTH_MAX       US_TO_TICKS(CHANNEL_WIDTH_MAX_US-PULSE_WIDTH_MIN_US+GUARD_US)
+#define SYNC_WIDTH_MAX      US_TO_TICKS(((CHANNEL_WIDTH_MAX_US+GUARD_US)*CPPCM_MAX_CHANNELS)+SYNC_WIDTH_MIN_US)
 
 // Timer is just running normal free-run mode. The top will be defined as 2^16 -1
 //
@@ -115,9 +115,11 @@ void CPPCMDsr::read(int16_t *values)
 {
     noInterrupts();
 
-    for (int i=0; i < _channels; ++i)
+    uint8_t buffer = _buffer; // use failsafe buffer if needed
+
+    for (uint8_t i=0; i < _channels; ++i)
     {
-        values[i] = map(_servos[_buffer][i],
+        values[i] = map(_servos[buffer][i],
                           CHN_WIDTH_MIN,
                           CHN_WIDTH_MAX,
                           0, 255);
@@ -139,11 +141,12 @@ ISR(TIMER1_CAPT_vect)
     //
     static uint8_t  channels_count    = 0;
     static uint16_t last_capture_time = 0;
+    static bool     pulse_expected    = true;
 
     // TODO: place the following variables in register
     //
     uint16_t capture_time; // current ticks read
-    uint16_t signal_width; //
+    uint16_t signal_width; // current signal width
     uint8_t  signal_level; // signal high or low ?
 
     // Disable interrupt first, to avoid multiple interrupts causing hanging/restart - or just weird behavior:
@@ -179,147 +182,191 @@ ISR(TIMER1_CAPT_vect)
     //
     last_capture_time = capture_time;
 
-    if (CPPCM._search)
+    if (signal_width > SYNC_WIDTH_MAX)
     {
-        // Searching for a SYNC pulse, either the first one or after
-        // a corrupted frame or lost connection
+        // Got a pulse after the maximum allowed SYNC pulse time
         //
-        if (signal_width > SYNC_WIDTH_MAX)
-        {
-            // Got a pulse after the maximum allowed SYNC pulse time
-            //
-            // We are not receiving valid PPM frames
-            //
-            // Set out of SYNC
-            //
-            CPPCM._synced = false;
+        // Maybe we are receiving pulses after a connection lost
+        //
+        // Exit from channels capture mode and enter in searching mode
+        //
+        CPPCM._mode = CPPCMDsr::SYNC_SEARCH;
 
-            // Reset the channels count
-            //
-            channels_count = 0;
-        }
-        else
-        if (signal_width > SYNC_WIDTH_MIN)
+        // Set out of SYNC
+        //
+        CPPCM._synced = false;
+
+        // Reset channel-count
+        //
+        channels_count = 0;
+    }
+    else
+    if (signal_width > SYNC_WIDTH_MIN)
+    {
+        // Got a pulse within the allowed SYNC pulse time range
+        //
+        if (CPPCMDsr::SYNC_SEARCH == CPPCM._mode)
         {
-            // Got a pulse within the allowed SYNC pulse time range
-            //
             // Exit from searching mode and enter in channels capture mode
             //
-            CPPCM._search = false;
+            CPPCM._mode = CPPCMDsr::CHANNELS_CAPTURE;
 
             // Save the SYNC pulse signal level
             //
-            // It shall be the same for all the gaps periods
+            //        +---------------------------------+
+            //        | with positive shift we are here |
+            //        +-----------------+---------------+
+            //                          .
+            //                          v
+            //                         .==== [ signal_level=1 ]
+            //                        ||
+            //                        ||
+            //                        ||
+            //  == /// ===============' . . . . . . . . . . . .
             //
-            CPPCM._signal_level = signal_level;
+            //  <- >= SYNC_WIDTH_MIN ->
+            //
+            //  == /// ===============.
+            //                        ||
+            //                        ||
+            //                        ||
+            //   . . . . . . . . . . . `==== [ signal_level=0 ]
+            //                          ^
+            //                          |
+            //        +-----------------+---------------+
+            //        | with negative shift we are here |
+            //        +---------------------------------+
+            //
+            CPPCM._pulse_level = signal_level;
+        }
+        else
+        if (CPPCM._pulse_level != signal_level)
+        {
+            // Got a SYNC pulse with mismatching signal level
+            //
+            // Invalid pulse
+            //
+            // TODO
+        }
+        else
+        if (channels_count == 0)
+        {
+            // Got a SYNC pulse after an empty frame
+            //
+            // Invalid frame
+            //
+            // TODO
+        }
+        else
+        if (CPPCM._channels == 0)
+        {
+            // Got the first SYNC pulse ever
+            //
+            CPPCM._channels = channels_count;
+        }
+        else
+        if (CPPCM._channels != channels_count)
+        {
+            // This frame has a mismatching number of channels
+            //
+            // Invalid frame
+            //
+            // TODO
+        }
+        else
+        {
+            // handle the collected data
 
-            // Reset the channels count
+            // Reset the failsafe counter
             //
-            channels_count = 0;
+            CPPCM._hold_frames = CPPCMDsr::HOLD_FRAMES;
+
+            if (CPPCM._got_failsafe_frame)
+            {
+                // We are up and running
+                //
+                // switch the working buffer
+                //
+                CPPCM._buffer ^= 0x01;
+
+                CPPCM._synced = true;
+            }
+            else
+            if (CPPCM._good_frames <= 0)
+            {
+                // save collected data as fail safe
+                //
+                uint8_t a = CPPCM._buffer;
+                uint8_t b = a^0x01;
+
+                for (uint8_t c=0; c<channels_count; c++)
+                {
+                    CPPCM._servos[b][c] = CPPCM._servos[a][c];
+                }
+
+                CPPCM._buffer             = 0;
+                CPPCM._got_failsafe_frame = true;
+            }
+            else
+            {
+                // TODO: learn transmitter signature and throttle channel
+
+                --CPPCM._good_frames;
+            }
         }
 
-        // In search mode ignore short pulses until a valid SYNC pulse
+        // Reset channel-count
+        //
+        channels_count = 0;
     }
     else
+    if (CPPCMDsr::SYNC_SEARCH == CPPCM._mode)
     {
-        // Capturing channels
-        //
-        if (signal_width > SYNC_WIDTH_MAX)
-        {
-            // Got a pulse after the maximum allowed SYNC pulse time
-            //
-            // Maybe we are receiving pulses after a connection lost
-            //
-            // Exit from channels capture mode and enter in searching mode
-            //
-            CPPCM._search = true;
+        // In search mode ignore short pulses until a valid SYNC pulse
 
-            // Set out of SYNC
-            //
-            CPPCM._synced = false;
+        /* nop */ ;
+    }
+    else
+    if (channels_count > CPPCM_MAX_CHANNELS)
+    {
+        // Max channels count reached, wait for a new valid SYNC pulse
 
-            // Reset channel-count
-            //
-            channels_count = 0;
-        }
-        else
-        if (signal_width > SYNC_WIDTH_MIN)
-        {
-            // Got a pulse within the allowed SYNC pulse time range
-            //
-            if (CPPCM._signal_level != signal_level)
-            {
-                // Got a SYNC pulse with mismatching signal level
-                //
-                // Invalid pulse
-                //
-                // TODO
-            }
-            else
-            if (channels_count == 0)
-            {
-                // Got a SYNC pulse after an empty frame
-                //
-                // Invalid frame
-                //
-                // TODO
-            }
-            else
-            if (CPPCM._channels == 0)
-            {
-                // Got the first SYNC pulse ever
-                //
-                CPPCM._synced   = true;
-                CPPCM._channels = channels_count;
-            }
-            else
-            if (CPPCM._channels != channels_count)
-            {
-                // This frame has a mismatching number of channels
-                //
-                // Invalid frame
-                //
-                // TODO
-            }
+        /* nop */ ;
+    }
+    else
+    if (signal_width < PULSE_WIDTH_MIN)
+    {
+        // Ignore glitches
 
-            // Reset channel-count
-            //
-            channels_count = 0;
-        }
-        else
-        if (channels_count > CPPCM_MAX_CHANNELS)
-        {
-            // Too many channels ?
-            //
-            // TODO
-            //
-            /* nop */ ;
-        }
-        else
-        if (signal_width < PULSE_WIDTH_MIN)
-        {
-            // Glitch ?
-            //
-            // TODO
-            //
-            /* nop */ ;
-        }
-        else
-        if (signal_width < PULSE_WIDTH_MAX)
+        /* nop */ ;
+    }
+    else
+    if (signal_width < PULSE_WIDTH_MAX)
+    {
+        if (CPPCM._pulse_level != signal_level)
         {
             CPPCM._pulses[channels_count] = signal_width;
         }
         else
-        if (signal_width < GAP_WIDTH_MIN)
         {
-            // Hmmm, zombie zone...
-            //
-            // TODO
-            //
+            // Ignore glitches
+
             /* nop */ ;
         }
-        else
-        if (signal_width < GAP_WIDTH_MAX)
+    }
+    else
+    if (signal_width < GAP_WIDTH_MIN)
+    {
+        // Hmmm, zombie zone...
+        //
+        // TODO
+        //
+        /* nop */ ;
+    }
+    else
+    if (signal_width < GAP_WIDTH_MAX)
+    {
+        if (CPPCM._pulse_level == signal_level)
         {
             // The pulse delay is recognised as valid servo pulse
             // Averaging the current reading with the latest good one
@@ -331,14 +378,14 @@ ISR(TIMER1_CAPT_vect)
 
             ++channels_count;
         }
-        else
-        {
-            // Pulse delay too large ?
-            //
-            // TODO
-            //
-            /* nop */ ;
-        }
+    }
+    else
+    {
+        // Pulse delay too large ?
+        //
+        // TODO
+        //
+        /* nop */ ;
     }
 
     // Enable interrupt again:
