@@ -11,11 +11,13 @@
 #define PULSE_WIDTH_MAX_US      (CHANNEL_WIDTH_MIN_US-PULSE_WIDTH_MIN_US-2*GUARD_US)
 #define SYNC_WIDTH_MIN_US       2500
 
-#define PULSE_WIDTH_MIN     US_TO_TICKS(PULSE_WIDTH_MIN_US-GUARD_US)
-#define PULSE_WIDTH_MAX     US_TO_TICKS(PULSE_WIDTH_MAX_US+GUARD_US)
-#define GAP_WIDTH_MIN       US_TO_TICKS(CHANNEL_WIDTH_MIN_US-PULSE_WIDTH_MAX_US-GUARD_US)
-#define GAP_WIDTH_MAX       US_TO_TICKS(CHANNEL_WIDTH_MAX_US-PULSE_WIDTH_MIN_US+GUARD_US)
-#define SYNC_WIDTH_MAX      US_TO_TICKS(((CHANNEL_WIDTH_MAX_US+GUARD_US)*CPPCM_MAX_CHANNELS)+SYNC_WIDTH_MIN_US)
+#define PULSE_WIDTH_MIN       US_TO_TICKS(PULSE_WIDTH_MIN_US-GUARD_US)
+#define PULSE_WIDTH_MAX       US_TO_TICKS(PULSE_WIDTH_MAX_US+GUARD_US)
+#define GAP_WIDTH_MIN         US_TO_TICKS(CHANNEL_WIDTH_MIN_US-PULSE_WIDTH_MAX_US-GUARD_US)
+#define GAP_WIDTH_MAX         US_TO_TICKS(CHANNEL_WIDTH_MAX_US-PULSE_WIDTH_MIN_US+GUARD_US)
+#define SYNC_WIDTH_MAX        US_TO_TICKS(((CHANNEL_WIDTH_MAX_US+GUARD_US)*CPPCM_MAX_CHANNELS)+SYNC_WIDTH_MIN_US)
+
+#define PULSE_WIDTH_TO_BIT(w) (((w) - PULSE_WIDTH_MIN) << CPPCM._bits_per_pulses) / (PULSE_WIDTH_MAX - PULSE_WIDTH_MIN)
 
 // Timer is just running normal free-run mode. The top will be defined as 2^16 -1
 //
@@ -139,6 +141,7 @@ ISR(TIMER1_CAPT_vect)
 {
     // Variables used:
     //
+    static bool     parser_init       = true;
     static uint8_t  channels_count    = 0;
     static uint16_t last_capture_time = 0;
     static bool     pulse_expected    = true;
@@ -182,6 +185,24 @@ ISR(TIMER1_CAPT_vect)
     //
     last_capture_time = capture_time;
 
+    if (parser_init)
+    {
+        // This is the firt call ever or after an unrecovarable error
+        //
+        // Initiaize the parser
+        //
+        parser_init               = false;
+        channels_count            = 0;
+        CPPCM._channels           = 0;
+        CPPCM._synced             = false;
+        CPPCM._mode               = CPPCMDsr::SYNC_SEARCH;
+        CPPCM._good_frames        = CPPCMDsr::GOOD_FRAMES_COUNT;
+	    CPPCM._hold_frames        = CPPCMDsr::HOLD_FRAMES_COUNT;
+        CPPCM._arm_frames         = CPPCMDsr::ARM_FRAMES_COUNT ;
+        CPPCM._buffer             = 0;
+        CPPCM._got_failsafe_frame = false;
+    }
+    else
     if (signal_width > SYNC_WIDTH_MAX)
     {
         // Got a pulse after the maximum allowed SYNC pulse time
@@ -198,7 +219,8 @@ ISR(TIMER1_CAPT_vect)
 
         // Reset channel-count
         //
-        channels_count = 0;
+        channels_count  = 0;
+        CPPCM._channels = 0;
     }
     else
     if (signal_width > SYNC_WIDTH_MIN)
@@ -258,14 +280,7 @@ ISR(TIMER1_CAPT_vect)
             // TODO
         }
         else
-        if (CPPCM._channels == 0)
-        {
-            // Got the first SYNC pulse ever
-            //
-            CPPCM._channels = channels_count;
-        }
-        else
-        if (CPPCM._channels != channels_count)
+        if ((CPPCM._channels != 0) && (CPPCM._channels != channels_count))
         {
             // This frame has a mismatching number of channels
             //
@@ -279,7 +294,7 @@ ISR(TIMER1_CAPT_vect)
 
             // Reset the failsafe counter
             //
-            CPPCM._hold_frames = CPPCMDsr::HOLD_FRAMES;
+            CPPCM._hold_frames = CPPCMDsr::HOLD_FRAMES_COUNT;
 
             if (CPPCM._got_failsafe_frame)
             {
@@ -294,16 +309,6 @@ ISR(TIMER1_CAPT_vect)
             else
             if (CPPCM._good_frames <= 0)
             {
-                // save collected data as fail safe
-                //
-                uint8_t a = CPPCM._buffer;
-                uint8_t b = a^0x01;
-
-                for (uint8_t c=0; c<channels_count; c++)
-                {
-                    CPPCM._servos[b][c] = CPPCM._servos[a][c];
-                }
-
                 CPPCM._buffer             = 0;
                 CPPCM._got_failsafe_frame = true;
             }
@@ -345,7 +350,7 @@ ISR(TIMER1_CAPT_vect)
     {
         if (CPPCM._pulse_level != signal_level)
         {
-            CPPCM._pulses[channels_count] = signal_width;
+            CPPCM._signature |= PULSE_WIDTH_TO_BIT(signal_width) << (channels_count * CPPCM._bits_per_pulses);
         }
         else
         {
@@ -374,7 +379,21 @@ ISR(TIMER1_CAPT_vect)
             signal_width  += CPPCM._servos[CPPCM._buffer][channels_count];
             signal_width >>= 1;
 
-            CPPCM._servos[CPPCM._buffer^0x01][channels_count] = signal_width;
+            if (CPPCM._got_failsafe_frame)
+            {
+                // The working data can be collected only after the safety
+                // values are collected
+                //
+                CPPCM._servos[CPPCM._buffer^0x01][channels_count] = signal_width;
+            }
+            else
+            {
+                // Until the startup is completed data is collected both in the
+                // safety buffer and in the active working buffer
+                //
+                CPPCM._servos[CPPCM._buffer][channels_count] = signal_width;
+                CPPCM._safety               [channels_count] = signal_width;
+            }
 
             ++channels_count;
         }

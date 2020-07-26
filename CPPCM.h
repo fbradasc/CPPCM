@@ -8,15 +8,15 @@
 
 // number of consecutive good frames required at startup.
 //
-#define GOOD_COUNT 10
+#define GOOD_FRAMES_COUNT 10
 
 // number of consecutive bad frames accepted without going to failsafe.
 //
-#define HOLD_COUNT 25
+#define HOLD_FRAMES_COUNT 25
 
 // number of consecutive low throttle frames required before arming.
 //
-#define	ARM_COUNT 10
+#define	ARM_FRAMES_COUNT 10
 
 #define FAILSAFE_BUFFER_BIT 1
 
@@ -31,15 +31,16 @@ public:
         CHANNELS_CAPTURE
     };
 
-    CPPCMDsr()
-        : _good_frames       (GOOD_COUNT)
-	    , _hold_frames       (HOLD_COUNT)
-        , _arm_frames        (ARM_COUNT )
-        , _buffer            (2<<FAILSAFE_BUFFER_BIT)
+    CPPCMDsr(uint8_t bits_per_pulses)
+        : _good_frames       (GOOD_FRAMES_COUNT)
+	    , _hold_frames       (HOLD_FRAMES_COUNT)
+        , _arm_frames        (ARM_FRAMES_COUNT )
+        , _buffer            (0)
         , _mode              (SYNC_SEARCH)
         , _synced            (false)
         , _got_failsafe_frame(false)
         , _pulse_level       (true) // PPM with positive shift by default
+        , _bits_per_pulses   (bits_per_pulses)
     {
     }
 
@@ -68,9 +69,11 @@ private:
     volatile uint8_t  _channels;
     volatile uint8_t  _buffer;
     volatile Mode     _mode;
-    volatile int16_t  _servos[4][CPPCM_MAX_CHANNELS];
+    volatile int16_t  _servos[2][CPPCM_MAX_CHANNELS];
+    volatile int16_t  _safety[CPPCM_MAX_CHANNELS];
     volatile int16_t  _pulses[CPPCM_MAX_CHANNELS];
     volatile uint8_t  _throttle_channel;
+    volatile uint8_t  _bits_per_pulses;
 };
 
 extern CPPCMDsr CPPCM;
