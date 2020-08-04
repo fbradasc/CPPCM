@@ -273,7 +273,7 @@
 													},
 													"visible": false,
 													"font": "Arial;13;0",
-													"left": -572,
+													"left": -348,
 													"top": -220,
 													"height": 13
 												},
@@ -284,9 +284,9 @@
 														"$ref": "AAAAAAFzsBJj9HUE9+k="
 													},
 													"font": "Arial;13;1",
-													"left": 333,
+													"left": 445,
 													"top": 183,
-													"width": 487,
+													"width": 260,
 													"height": 13,
 													"text": "SyncSearch"
 												},
@@ -298,7 +298,7 @@
 													},
 													"visible": false,
 													"font": "Arial;13;0",
-													"left": -572,
+													"left": -348,
 													"top": -220,
 													"width": 38,
 													"height": 13,
@@ -312,7 +312,7 @@
 													},
 													"visible": false,
 													"font": "Arial;13;0",
-													"left": 225,
+													"left": 449,
 													"top": 174,
 													"width": 267,
 													"height": 13,
@@ -320,9 +320,9 @@
 												}
 											],
 											"font": "Arial;13;0",
-											"left": 328,
+											"left": 440,
 											"top": 176,
-											"width": 497,
+											"width": 270,
 											"height": 25,
 											"stereotypeLabel": {
 												"$ref": "AAAAAAFzsBJj9HUFQac="
@@ -357,9 +357,9 @@
 														"$ref": "AAAAAAFzsD1px3evaNE="
 													},
 													"font": "Arial;13;0",
-													"left": 333,
+													"left": 445,
 													"top": 206,
-													"width": 487,
+													"width": 260,
 													"height": 13,
 													"text": "entry/pulse_level=HIGH",
 													"horizontalAlignment": 0
@@ -374,9 +374,9 @@
 														"$ref": "AAAAAAFztMupk5LRs2Y="
 													},
 													"font": "Arial;13;0",
-													"left": 333,
+													"left": 445,
 													"top": 221,
-													"width": 487,
+													"width": 260,
 													"height": 13,
 													"text": "entry/sync_cycles=0",
 													"horizontalAlignment": 0
@@ -391,9 +391,9 @@
 														"$ref": "AAAAAAFztNjTZ5L6q3E="
 													},
 													"font": "Arial;13;0",
-													"left": 333,
+													"left": 445,
 													"top": 236,
-													"width": 487,
+													"width": 260,
 													"height": 13,
 													"text": "entry/frame_buffer=0",
 													"horizontalAlignment": 0
@@ -408,11 +408,11 @@
 														"$ref": "AAAAAAFzsN2yMHjJIy8="
 													},
 													"font": "Arial;13;0",
-													"left": 333,
+													"left": 445,
 													"top": 251,
-													"width": 487,
+													"width": 260,
 													"height": 13,
-													"text": "do/[sync_detected]: signal={{{0xffff,0,0,0},{0xffff,0,0,0}},{{0xffff,0,0,0},{0xffff,0,0,0}}}",
+													"text": "do/[sync_detected]: signal[*][*].reset()",
 													"horizontalAlignment": 0
 												},
 												{
@@ -425,18 +425,18 @@
 														"$ref": "AAAAAAFztLvO2JKg2C8="
 													},
 													"font": "Arial;13;0",
-													"left": 333,
+													"left": 445,
 													"top": 266,
-													"width": 487,
+													"width": 260,
 													"height": 13,
 													"text": "do/[sync_detected]: pulse_level=signal_level",
 													"horizontalAlignment": 0
 												}
 											],
 											"font": "Arial;13;0",
-											"left": 328,
+											"left": 440,
 											"top": 201,
-											"width": 497,
+											"width": 270,
 											"height": 83
 										},
 										{
@@ -450,7 +450,7 @@
 											},
 											"visible": false,
 											"font": "Arial;13;0",
-											"left": -286,
+											"left": -174,
 											"top": -110,
 											"width": 10,
 											"height": 10
@@ -465,16 +465,16 @@
 												"$ref": "AAAAAAFzsBJj9HUCItw="
 											},
 											"font": "Arial;13;0",
-											"left": 328,
+											"left": 440,
 											"top": 284,
-											"width": 497
+											"width": 270
 										}
 									],
 									"font": "Arial;13;0",
 									"containerChangeable": true,
-									"left": 328,
+									"left": 440,
 									"top": 176,
-									"width": 497,
+									"width": 270,
 									"height": 108,
 									"nameCompartment": {
 										"$ref": "AAAAAAFzsBJj9HUE9+k="
@@ -2407,8 +2407,8 @@
 											},
 											"visible": false,
 											"font": "Arial;13;0",
-											"left": 997,
-											"top": 320,
+											"left": 1063,
+											"top": 240,
 											"height": 13,
 											"alpha": 1.5707963267948966,
 											"distance": 15,
@@ -2428,8 +2428,8 @@
 											},
 											"visible": null,
 											"font": "Arial;13;0",
-											"left": 994,
-											"top": 335,
+											"left": 1063,
+											"top": 255,
 											"height": 13,
 											"alpha": 1.5707963267948966,
 											"distance": 30,
@@ -2449,8 +2449,8 @@
 											},
 											"visible": false,
 											"font": "Arial;13;0",
-											"left": 1002,
-											"top": 291,
+											"left": 1064,
+											"top": 211,
 											"height": 13,
 											"alpha": -1.5707963267948966,
 											"distance": 15,
@@ -2468,7 +2468,7 @@
 										"$ref": "AAAAAAFzsCo5snbdhD0="
 									},
 									"lineStyle": 3,
-									"points": "770:619;1000:312;825:278",
+									"points": "770:619;1064:232;710:230",
 									"showVisibility": true,
 									"nameLabel": {
 										"$ref": "AAAAAAFzsCwIhHctddU="
@@ -2767,12 +2767,12 @@
 									"_parent": {
 										"$ref": "AAAAAAFzsBGozXTWKAA="
 									},
-									"font": "Arial;13;0",
-									"left": 904,
-									"top": 504,
-									"width": 657,
-									"height": 488,
-									"text": "common oprations to all states:\n \ntypedef struct _signal\n{\n    uint16_t min_duration;\n    uint16_t max_duration;\n    uint16_t sum_duration;\n    unit16_t durations[MAX_CHANNELS];\n    uint8_t   captures;\n}\nSignal;\n \nSignal signal[2][2];\n \nsignal_level=PIN_LEVEL\nsignal_duration = current_capture_time = TIMER\n[last_capture_time>current_capture_time]: signal_duration += (MAX_DURATION-last_capture_time)\n[last_capture_time<=current_capture_time]: signal_duration -= last_capture_time\nlast_capture_time=current_capture_time\n \n[signal_duration < MIN_SYNC_DURATION]: {\n    signal[frame_buffer][signal_level].min_duration = min(signal[signal_level].min_duration,signal_duration)\n    signal[frame_buffer][signal_level].max_duration = max(signal[signal_level].max_duration,signal_duration)\n    signal[frame_buffer][signal_level].sum_duration += signal_duration\n    [signal[frame_buffer][signal_level].captures < MAX_CHANNELS]: {\n        signal[frame_buffer][signal_level].durations[signal[frame_buffer][signal_level].captures] = signal_duration\n    }\n    signal[frame_buffer][signal_level].captures++\n}\n \nsync_detected = [MIN_SYNC_DURATION<=signal_duration<=MAX_SYNC_DURATION)]"
+									"font": "Source Code Pro;13;0",
+									"left": 896,
+									"top": 472,
+									"width": 1161,
+									"height": 4068,
+									"text": "common oprations to all states:\n \n#if MAX_DELTA==0\n#define ARE_VERY_CLOSE(a,b) ((a)==(b))\n#else\n#define ARE_VERY_CLOSE(a,b) ((((a)>(b)) ? (a)-(b) : (b)-(a)) <= MAX_DELTA)\n#endif\n \n#define IS_IN_RANGE(v,min,max) (((v)>=(min)) && ((v)<=(max)))\n \n// 10 Channles\n// ===========\n//\n// Pulse |     bit 0      |       bit 1\n// ------+----------------+------------------ \n// 1     | tx_id.bits.b0  | rx_id.bits.b0\n// 2     | tx_id.bits.b1  | rx_id.bits.b1\n// 3     | tx_id.bits.b2  | rx_id.bits.b2\n// 4     | tx_id.bits.b3  | rx_id.bits.b3\n// 5     | tx_id.bits.b4  | rx_sub_id.bits.b0\n// 6     | tx_id.bits.b5  | rx_sub_id.bits.b1\n// 7     | tx_id.bits.b6  | rx_sub_id.bits.b2\n// 8     | tx_id.bits.b7  | rx_sub_id.bits.b3\n// 9     | scan.bits.b0   | parity.bits.b0\n// 10    | scan.bits.b1   | parity.bits.b1\n// 11    | scan.bits.b2   | parity.bits.b2\n//\n//    |          |                 scan                  |\n// CH | Function |  1 |  2 |  3 |  4 |  5 |  6 |  7 |  8 |\n// ---+----------+----+----+----+----+----+----+----+----+\n//  1 | joystick |  1 |  1 |  1 |  1 |  1 |  1 |  1 |  1 |\n//  2 | joystick |  2 |  2 |  2 |  2 |  2 |  2 |  2 |  2 |\n//  3 | joystick |  3 |  3 |  3 |  3 |  3 |  3 |  3 |  3 |\n//  4 | joystick |  4 |  4 |  4 |  4 |  4 |  4 |  4 |  4 |\n//  5 | rotary   |  1 |  2 |  3 |  4 |  1 |  2 |  3 |  4 |\n//  6 | rotary   |  5 |  6 |  7 |  8 |  5 |  6 |  7 |  8 |\n//  7 | rotary   |  9 | 10 | 11 | 12 |  9 | 10 | 11 | 12 |\n//  8 | switch   |  1 |  2 |  3 |  4 |  5 |  6 |  7 |  8 | 4 levels: 1 bit sw.A + 1 bit sw.B\n//  9 | switch   |  9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 4 levels: 1 bit sw.A + 1 bit sw.B\n// 10 | button   |  1 |  2 |  3 |  4 |  5 |  6 |  7 |  8 | 2 levels: 1 bit\n// ---+----------+----+----+----+----+----+----+----+----+\n//\n// 9 Channels\n// ==========\n//\n// Pulse |     bit 0      |       bit 1\n// ------+----------------+------------------ \n// 1     | tx_id.bits.b0  | rx_id.bits.b0\n// 2     | tx_id.bits.b1  | rx_id.bits.b1\n// 3     | tx_id.bits.b2  | rx_id.bits.b2\n// 4     | tx_id.bits.b3  | rx_id.bits.b3\n// 5     | tx_id.bits.b4  | rx_sub_id.bits.b0\n// 6     | tx_id.bits.b5  | rx_sub_id.bits.b1\n// 7     | tx_id.bits.b6  | rx_sub_id.bits.b2\n// 8     | tx_id.bits.b7  | rx_sub_id.bits.b3\n// 9     | scan.bits.b0   | parity.bits.b0\n// 10    | scan.bits.b1   | parity.bits.b1\n//\n//    |          |                    scan                   |\n// CH | Function |    1     |     2    |     3    |     4    |\n// ---+----------+----------+----------+----------+----------+\n//  1 | joystick |    1     |     1    |     1    |     1    |\n//  2 | joystick |    2     |     2    |     2    |     2    |\n//  3 | joystick |    3     |     3    |     3    |     3    |\n//  4 | joystick |    4     |     4    |     4    |     4    |\n//  5 | rotary   |    1     |     2    |     3    |     4    |\n//  6 | rotary   |    5     |     6    |     7    |     8    |\n//  7 | rotary   |    9     |    10    |    11    |    12    |\n//  8 | btn+(sw) | 1+(1+ 9) | 2+(2+10) | 3+(3+11) | 4+(4+12) | 32 levels: 1 bit button + 1 bit sw1.A + 1 bit sw1.B + 1 bit sw2.A + 1 bit sw2.B\n//  9 | btn+(sw) | 5+(5+13) | 6+(6+14) | 7+(7+15) | 8+(8+16) | 32 levels: 1 bit button + 1 bit sw1.A + 1 bit sw1.B + 1 bit sw2.A + 1 bit sw2.B\n// ---+----------+----------+----------+----------+----------+\n//\nclass Signature\n{\npublic:\n    union\n    {\n        uint8_t value;\n \n        struct\n        {\n            uint8_t b0:1;\n            uint8_t b1:1;\n            uint8_t b2:1;\n            uint8_t b3:1;\n            uint8_t b4:1;\n            uint8_t b5:1;\n            uint8_t b6:1;\n            uint8_t b7:1;\n        }\n        bits;\n    }\n    tx_id;\n \n    union\n    {\n        uint8_t value;\n \n        struct\n        {\n            uint8_t b0:1;\n            uint8_t b1:1;\n            uint8_t b2:1;\n            uint8_t b3:1;\n        }\n        bits;\n    }\n    rx_id;\n \n    union\n    {\n        uint8_t value;\n \n        struct\n        {\n            uint8_t b0:1;\n            uint8_t b1:1;\n            uint8_t b2:1;\n            uint8_t b3:1;\n        }\n        bits;\n    }\n    rx_sub_id;\n \n    union\n    {\n        uint8_t value;\n \n        struct\n        {\n            uint8_t b0:1;\n            uint8_t b1:1;\n#if defined(10_CHANNELS)\n            uint8_t b2:1;\n#endif // 10_CHANNELS\n        }\n        bits;\n    }\n    scan;\n \n    union\n    {\n        uint8_t value;\n \n        struct\n        {\n            uint8_t b0:1;\n            uint8_t b1:1;\n#if defined(10_CHANNELS)\n            uint8_t b2:1;\n#endif // 10_CHANNELS\n        }\n        bits;\n    }\n    parity;\n \n    typedef struct\n    {\n        uint16_t b00:1;\n        uint16_t b01:1;\n        uint16_t b02:1;\n        uint16_t b03:1;\n        uint16_t b04:1;\n        uint16_t b05:1;\n        uint16_t b06:1;\n        uint16_t b07:1;\n        uint16_t b08:1;\n        uint16_t b09:1;\n        uint16_t b10:1;\n        uint16_t b11:1;\n        uint16_t b12:1;\n        uint16_t b13:1;\n        uint16_t b14:1;\n        uint16_t b15:1;\n    }\n    multi_switch_t;\n \n    struct\n    {\n        uint8_t b0:1;\n        uint8_t b1:1;\n        uint8_t b2:1;\n        uint8_t b3:1;\n        uint8_t b4:1;\n        uint8_t b5:1;\n        uint8_t b6:1;\n        uint8_t b7:1;\n    }\n    buttons_t;\n \n    multi_switch_t switches_a;\n    multi_switch_t switches_b;\n    buttons_t      buttons;\n    uint16_t frame_duration;\n};\n \nclass Signal\n{\npublic:\n    uint16_t min_duration;\n    uint16_t max_duration;\n    uint16_t sum_duration;\n    unit16_t durations[MAX_CHANNELS];\n    uint8_t   captures;\n \n    Signal()\n    {\n        reset();\n    }\n \n    inline void reset()\n    {\n        min_duration = 0xffff;\n        max_duration = 0;\n        sum_duration = 0;\n        durations = {0};\n        captures = 0;\n    }\n \n    inline void update(const uint16_t &signal_duration)\n    {\n        if (signal_duration < MIN_SYNC_DURATION)\n        {\n            min_duration = min(min_duration,signal_duration);\n            max_duration = max(max_duration,signal_duration);\n            sum_duration += signal_duration;\n \n            if (captures < MAX_CHANNELS)\n            {\n                durations[captures] = signal_duration;\n            }\n \n            captures++;\n        }\n    }\n \n    inline bool operator==(const Signal &ref)\n    {\n        return ARE_VERY_CLOSE(min_duration,ref.min_duration)\n                 &&\n                 ARE_VERY_CLOSE(max_duration,ref.max_duration)\n                 &&\n                 ARE_VERY_CLOSE(sum_duration,ref.sum_duration)\n                 &&\n                 (captures == ref.captures);\n    }\n \n    inline is_valid(const uint16_t &min_value, const uint16_t &max_value)\n    {\n        return IS_IN_RANGE(captures, MIN_CHANNELS, MAX_CHANNELS)\n                 &&\n                 IS_IN_RANGE(min_duration, min_value, max_value)\n                 &&\n                 IS_IN_RANGE(max_duration, min_value, max_value)\n                 &&\n                 IS_IN_RANGE(sum_duration / captures, min_value, max_value);\n    }\n};\n \nSignal signal[2][2];\n \nsignal_level=PIN_LEVEL;\nsignal_duration = current_capture_time = TIMER;\n[last_capture_time>current_capture_time]: signal_duration += (MAX_DURATION-last_capture_time);\n[last_capture_time<=current_capture_time]: signal_duration -= last_capture_time;\nlast_capture_time=current_capture_time;\n \nsignal[frame_buffer][signal_level].update(signal_duration);\n \nsync_detected = IS_IN_RANGE(signal_duration, MIN_SYNC_DURATION, MAX_SYNC_DURATION);\n\n\n\n"
 								},
 								{
 									"_type": "UMLStateView",
@@ -2802,7 +2802,7 @@
 													},
 													"visible": false,
 													"font": "Arial;13;0",
-													"left": 238,
+													"left": 318,
 													"top": -544,
 													"height": 13
 												},
@@ -2813,9 +2813,9 @@
 														"$ref": "AAAAAAFztKsbpJIiOFk="
 													},
 													"font": "Arial;13;1",
-													"left": 309,
+													"left": 349,
 													"top": 327,
-													"width": 530.35595703125,
+													"width": 456.5302734375,
 													"height": 13,
 													"text": "Synchronization"
 												},
@@ -2827,7 +2827,7 @@
 													},
 													"visible": false,
 													"font": "Arial;13;0",
-													"left": 238,
+													"left": 318,
 													"top": -544,
 													"width": 38,
 													"height": 13,
@@ -2841,16 +2841,16 @@
 													},
 													"visible": false,
 													"font": "Arial;13;0",
-													"left": 238,
+													"left": 318,
 													"top": -544,
 													"height": 13,
 													"horizontalAlignment": 1
 												}
 											],
 											"font": "Arial;13;0",
-											"left": 304,
+											"left": 344,
 											"top": 320,
-											"width": 540.35595703125,
+											"width": 466.5302734375,
 											"height": 25,
 											"stereotypeLabel": {
 												"$ref": "AAAAAAFztKsbpJIjlNs="
@@ -2885,9 +2885,9 @@
 														"$ref": "AAAAAAFzsFklV3guWOw="
 													},
 													"font": "Arial;13;0",
-													"left": 309,
+													"left": 349,
 													"top": 350,
-													"width": 530.35595703125,
+													"width": 456.5302734375,
 													"height": 13,
 													"text": "do/[sync_detected && valid_sync_frame]: sync_cycles++",
 													"horizontalAlignment": 0
@@ -2902,9 +2902,9 @@
 														"$ref": "AAAAAAFztPnwlZMaMlA="
 													},
 													"font": "Arial;13;0",
-													"left": 309,
+													"left": 349,
 													"top": 365,
-													"width": 530.35595703125,
+													"width": 456.5302734375,
 													"height": 13,
 													"text": "do/[sync_detected && valid_sync_frame && frame_buffer==0]: frame_buffer=1",
 													"horizontalAlignment": 0
@@ -2919,18 +2919,18 @@
 														"$ref": "AAAAAAFztN3DgZMNfAg="
 													},
 													"font": "Arial;13;0",
-													"left": 309,
+													"left": 349,
 													"top": 380,
-													"width": 530.35595703125,
+													"width": 456.5302734375,
 													"height": 13,
-													"text": "do/[sync_detected && valid_sync_frame]: signal[frame_buffer]={{0xffff,0,0,0},{0xffff,0,0,0}}",
+													"text": "do/[sync_detected && valid_sync_frame]: signal[frame_buffer][*].reset()",
 													"horizontalAlignment": 0
 												}
 											],
 											"font": "Arial;13;0",
-											"left": 304,
+											"left": 344,
 											"top": 345,
-											"width": 540.35595703125,
+											"width": 466.5302734375,
 											"height": 53
 										},
 										{
@@ -2944,7 +2944,7 @@
 											},
 											"visible": false,
 											"font": "Arial;13;0",
-											"left": 119,
+											"left": 159,
 											"top": -280,
 											"width": 10,
 											"height": 10
@@ -2959,16 +2959,16 @@
 												"$ref": "AAAAAAFztKsbo5Igh+4="
 											},
 											"font": "Arial;13;0",
-											"left": 304,
+											"left": 344,
 											"top": 398,
-											"width": 540.35595703125
+											"width": 466.5302734375
 										}
 									],
 									"font": "Arial;13;0",
 									"containerChangeable": true,
-									"left": 304,
+									"left": 344,
 									"top": 320,
-									"width": 540.35595703125,
+									"width": 466.5302734375,
 									"height": 78,
 									"nameCompartment": {
 										"$ref": "AAAAAAFztKsbpJIiOFk="
@@ -3177,12 +3177,12 @@
 									"_parent": {
 										"$ref": "AAAAAAFzsBGozXTWKAA="
 									},
-									"font": "Arial;13;0",
+									"font": "Source Code Pro;13;0",
 									"left": 904,
 									"top": 16,
-									"width": 1025,
-									"height": 295,
-									"text": "valid sync frame detection criteria:\n \nvalid_sync_frame = (MIN_CHANNELS <= signal[frame_buffer][pulse_level].captures <= MAX_CHANNELS)\n                             &&\n                             (MIN_PULSE_DURATION <= signal[frame_buffer][pulse_level].min_duration <= MAX_PULSE_DURATION)\n                             &&\n                             (MIN_PULSE_DURATION <= signal[frame_buffer][pulse_level].max_duration <= MAX_PULSE_DURATION)\n                             &&\n                             (MIN_PULSE_DURATION <= (signal[frame_buffer][pulse_level].sum_duration / signal[frame_buffer][pulse_level].captures) <= MAX_PULSE_DURATION)\n                             &&\n                             (signal[frame_buffer][!pulse_level].captures == (signal[frame_buffer][pulse_level].captures - 1))\n                             &&\n                             (MIN_GAP_DURATION <= signal[frame_buffer][!pulse_level].min_duration <= MAX_GAP_DURATION)\n                             &&\n                             (MIN_GAP_DURATION <= signal[frame_buffer][!pulse_level].max_duration <= MAX_GAP_DURATION)\n                             &&\n                             (MIN_GAP_DURATION <= (signal[frame_buffer][!pulse_level].sum_duration / signal[frame_buffer][!pulse_level].captures) <= MAX_GAP_DURATION)\n                             &&\n                             (signal[frame_buffer] == signal[0])"
+									"width": 953,
+									"height": 175,
+									"text": "valid sync frame detection criteria:\n \nvalid_sync_frame = (signal[frame_buffer][pulse_level].is_valid(MIN_PULSE_DURATION,MAX_PULSE_DURATION)\n                   &&\n                   (signal[frame_buffer][!pulse_level].is_valid(MIN_GAP_DURATION,MAX_GAP_DURATION)\n                   &&\n                   (signal[frame_buffer][!pulse_level].captures == (signal[frame_buffer][pulse_level].captures - 1))\n                   &&\n                   (signal[frame_buffer][0] == signal[0][0])\n                   &&\n                   (signal[frame_buffer][1] == signal[0][1]);"
 								},
 								{
 									"_type": "RectangleView",
@@ -3342,7 +3342,7 @@
 										"$ref": "AAAAAAFztQXXUpNZy6o="
 									},
 									"lineStyle": 3,
-									"points": "1122:311;1024:360;844:359"
+									"points": "1258:191;1024:360;811:359"
 								}
 							]
 						}
@@ -3431,7 +3431,7 @@
 											"_parent": {
 												"$ref": "AAAAAAFzsBJj9HUCItw="
 											},
-											"name": "[sync_detected]: signal={{{0xffff,0,0,0},{0xffff,0,0,0}},{{0xffff,0,0,0},{0xffff,0,0,0}}}"
+											"name": "[sync_detected]: signal[*][*].reset()"
 										},
 										{
 											"_type": "UMLActivity",
@@ -3521,7 +3521,7 @@
 											"_parent": {
 												"$ref": "AAAAAAFztKsbo5Igh+4="
 											},
-											"name": "[sync_detected && valid_sync_frame]: signal[frame_buffer]={{0xffff,0,0,0},{0xffff,0,0,0}}"
+											"name": "[sync_detected && valid_sync_frame]: signal[frame_buffer][*].reset()"
 										}
 									]
 								}
