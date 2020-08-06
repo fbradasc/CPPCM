@@ -400,6 +400,23 @@
 												},
 												{
 													"_type": "UMLInternalActivityView",
+													"_id": "AAAAAAFzxEY2UAW6hpA=",
+													"_parent": {
+														"$ref": "AAAAAAFzsBJj9HUJza4="
+													},
+													"model": {
+														"$ref": "AAAAAAFzxEY2HwW3rBY="
+													},
+													"font": "Arial;13;0",
+													"left": 445,
+													"top": 251,
+													"width": 260,
+													"height": 13,
+													"text": "do/[sync_detected]: signature.reset()",
+													"horizontalAlignment": 0
+												},
+												{
+													"_type": "UMLInternalActivityView",
 													"_id": "AAAAAAFzsN2yY3jMGoc=",
 													"_parent": {
 														"$ref": "AAAAAAFzsBJj9HUJza4="
@@ -409,7 +426,7 @@
 													},
 													"font": "Arial;13;0",
 													"left": 445,
-													"top": 251,
+													"top": 266,
 													"width": 260,
 													"height": 13,
 													"text": "do/[sync_detected]: signal[*][*].reset()",
@@ -426,7 +443,7 @@
 													},
 													"font": "Arial;13;0",
 													"left": 445,
-													"top": 266,
+													"top": 281,
 													"width": 260,
 													"height": 13,
 													"text": "do/[sync_detected]: pulse_level=signal_level",
@@ -437,7 +454,7 @@
 											"left": 440,
 											"top": 201,
 											"width": 270,
-											"height": 83
+											"height": 98
 										},
 										{
 											"_type": "UMLInternalTransitionCompartmentView",
@@ -466,7 +483,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 440,
-											"top": 284,
+											"top": 299,
 											"width": 270
 										}
 									],
@@ -475,7 +492,7 @@
 									"left": 440,
 									"top": 176,
 									"width": 270,
-									"height": 108,
+									"height": 123,
 									"nameCompartment": {
 										"$ref": "AAAAAAFzsBJj9HUE9+k="
 									},
@@ -1404,7 +1421,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 363,
-											"top": 454,
+											"top": 469,
 											"width": 188,
 											"height": 13,
 											"alpha": -1.5538491526953924,
@@ -1427,7 +1444,7 @@
 											"visible": null,
 											"font": "Arial;13;0",
 											"left": 605,
-											"top": 452,
+											"top": 467,
 											"height": 13,
 											"alpha": 1.5707963267948966,
 											"distance": 30,
@@ -1448,7 +1465,7 @@
 											"visible": false,
 											"font": "Arial;13;0",
 											"left": 561,
-											"top": 453,
+											"top": 468,
 											"height": 13,
 											"alpha": -1.5707963267948966,
 											"distance": 15,
@@ -1465,7 +1482,7 @@
 									"tail": {
 										"$ref": "AAAAAAFztKsbo5Ihdss="
 									},
-									"points": "576:397;576:521",
+									"points": "576:428;576:521",
 									"showVisibility": true,
 									"nameLabel": {
 										"$ref": "AAAAAAFzsCDsiXX9+BM="
@@ -2407,7 +2424,7 @@
 											},
 											"visible": false,
 											"font": "Arial;13;0",
-											"left": 1063,
+											"left": 1064,
 											"top": 240,
 											"height": 13,
 											"alpha": 1.5707963267948966,
@@ -2428,7 +2445,7 @@
 											},
 											"visible": null,
 											"font": "Arial;13;0",
-											"left": 1063,
+											"left": 1064,
 											"top": 255,
 											"height": 13,
 											"alpha": 1.5707963267948966,
@@ -2449,7 +2466,7 @@
 											},
 											"visible": false,
 											"font": "Arial;13;0",
-											"left": 1064,
+											"left": 1063,
 											"top": 211,
 											"height": 13,
 											"alpha": -1.5707963267948966,
@@ -2468,7 +2485,7 @@
 										"$ref": "AAAAAAFzsCo5snbdhD0="
 									},
 									"lineStyle": 3,
-									"points": "770:619;1064:232;710:230",
+									"points": "770:619;1064:232;710:236",
 									"showVisibility": true,
 									"nameLabel": {
 										"$ref": "AAAAAAFzsCwIhHctddU="
@@ -2771,8 +2788,8 @@
 									"left": 976,
 									"top": 416,
 									"width": 777,
-									"height": 370,
-									"text": "common oprations to all states:\n \n#if MAX_DELTA==0\n#define ARE_VERY_CLOSE(a,b) ((a)==(b))\n#else\n#define ARE_VERY_CLOSE(a,b) ((((a)>(b)) ? (a)-(b) : (b)-(a)) <= MAX_DELTA)\n#endif\n \n#define IS_IN_RANGE(v,min,max) (((v)>=(min)) && ((v)<=(max)))\n \nstatic Signal signal[2][2];\nstatic Signature signature(MY_RX_ID);\n \nsignal_level=PIN_LEVEL;\nsignal_duration = current_capture_time = TIMER;\n[last_capture_time>current_capture_time]: signal_duration += (MAX_DURATION-last_capture_time);\n[last_capture_time<=current_capture_time]: signal_duration -= last_capture_time;\nlast_capture_time=current_capture_time;\n \nsignal[frame_buffer][signal_level].update(signal_duration);\n \n[pulse_level == signal_level]: signature.update(signal[frame_buffer][signal_level]);\n \nsync_detected = IS_IN_RANGE(signal_duration, MIN_SYNC_DURATION, MAX_SYNC_DURATION);"
+									"height": 250,
+									"text": "common oprations to all states:\n \nstatic Signal signal[2][2];\nstatic Signature signature(MY_RX_ID);\n \nsignal_level=PIN_LEVEL;\nsignal_duration = current_capture_time = TIMER;\n[last_capture_time>current_capture_time]: signal_duration += (MAX_DURATION-last_capture_time);\n[last_capture_time<=current_capture_time]: signal_duration -= last_capture_time;\nlast_capture_time=current_capture_time;\n \nsignal[frame_buffer][signal_level].update(signal_duration);\n \n[pulse_level == signal_level]: signature.update(signal[frame_buffer][signal_level]);\n \nsync_detected = IS_IN_RANGE(signal_duration, MIN_SYNC_DURATION, MAX_SYNC_DURATION);"
 								},
 								{
 									"_type": "UMLStateView",
@@ -2803,7 +2820,7 @@
 													"visible": false,
 													"font": "Arial;13;0",
 													"left": 318,
-													"top": -544,
+													"top": -512,
 													"height": 13
 												},
 												{
@@ -2814,7 +2831,7 @@
 													},
 													"font": "Arial;13;1",
 													"left": 349,
-													"top": 327,
+													"top": 343,
 													"width": 456.5302734375,
 													"height": 13,
 													"text": "Synchronization"
@@ -2828,7 +2845,7 @@
 													"visible": false,
 													"font": "Arial;13;0",
 													"left": 318,
-													"top": -544,
+													"top": -512,
 													"width": 38,
 													"height": 13,
 													"text": "(from )"
@@ -2842,14 +2859,14 @@
 													"visible": false,
 													"font": "Arial;13;0",
 													"left": 318,
-													"top": -544,
+													"top": -512,
 													"height": 13,
 													"horizontalAlignment": 1
 												}
 											],
 											"font": "Arial;13;0",
 											"left": 344,
-											"top": 320,
+											"top": 336,
 											"width": 466.5302734375,
 											"height": 25,
 											"stereotypeLabel": {
@@ -2886,10 +2903,27 @@
 													},
 													"font": "Arial;13;0",
 													"left": 349,
-													"top": 350,
+													"top": 366,
 													"width": 456.5302734375,
 													"height": 13,
 													"text": "do/[sync_detected && valid_sync_frame]: sync_cycles++",
+													"horizontalAlignment": 0
+												},
+												{
+													"_type": "UMLInternalActivityView",
+													"_id": "AAAAAAFzxEQroQWxjF0=",
+													"_parent": {
+														"$ref": "AAAAAAFztKsbpJIndcg="
+													},
+													"model": {
+														"$ref": "AAAAAAFzxEQrSQWu35I="
+													},
+													"font": "Arial;13;0",
+													"left": 349,
+													"top": 381,
+													"width": 456.5302734375,
+													"height": 13,
+													"text": "do/[sync_detected && valid_sync_frame && frame_buffer==0]: signature.pair()",
 													"horizontalAlignment": 0
 												},
 												{
@@ -2903,7 +2937,7 @@
 													},
 													"font": "Arial;13;0",
 													"left": 349,
-													"top": 365,
+													"top": 396,
 													"width": 456.5302734375,
 													"height": 13,
 													"text": "do/[sync_detected && valid_sync_frame && frame_buffer==0]: frame_buffer=1",
@@ -2920,7 +2954,7 @@
 													},
 													"font": "Arial;13;0",
 													"left": 349,
-													"top": 380,
+													"top": 411,
 													"width": 456.5302734375,
 													"height": 13,
 													"text": "do/[sync_detected && valid_sync_frame]: signal[frame_buffer][*].reset()",
@@ -2929,9 +2963,9 @@
 											],
 											"font": "Arial;13;0",
 											"left": 344,
-											"top": 345,
+											"top": 361,
 											"width": 466.5302734375,
-											"height": 53
+											"height": 68
 										},
 										{
 											"_type": "UMLInternalTransitionCompartmentView",
@@ -2945,7 +2979,7 @@
 											"visible": false,
 											"font": "Arial;13;0",
 											"left": 159,
-											"top": -280,
+											"top": -264,
 											"width": 10,
 											"height": 10
 										},
@@ -2960,16 +2994,16 @@
 											},
 											"font": "Arial;13;0",
 											"left": 344,
-											"top": 398,
+											"top": 429,
 											"width": 466.5302734375
 										}
 									],
 									"font": "Arial;13;0",
 									"containerChangeable": true,
 									"left": 344,
-									"top": 320,
+									"top": 336,
 									"width": 466.5302734375,
-									"height": 78,
+									"height": 93,
 									"nameCompartment": {
 										"$ref": "AAAAAAFztKsbpJIiOFk="
 									},
@@ -3004,7 +3038,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 440,
-											"top": 293,
+											"top": 309,
 											"width": 97,
 											"height": 13,
 											"alpha": -1.588651908455542,
@@ -3027,7 +3061,7 @@
 											"visible": null,
 											"font": "Arial;13;0",
 											"left": 573,
-											"top": 294,
+											"top": 310,
 											"height": 13,
 											"alpha": 1.5707963267948966,
 											"distance": 30,
@@ -3048,7 +3082,7 @@
 											"visible": false,
 											"font": "Arial;13;0",
 											"left": 529,
-											"top": 295,
+											"top": 311,
 											"height": 13,
 											"alpha": -1.5707963267948966,
 											"distance": 15,
@@ -3065,7 +3099,7 @@
 									"tail": {
 										"$ref": "AAAAAAFzsBJj9HUDe9A="
 									},
-									"points": "544:283;544:320",
+									"points": "544:298;544:336",
 									"showVisibility": true,
 									"nameLabel": {
 										"$ref": "AAAAAAFztLT1DZJ5O3Y="
@@ -3098,7 +3132,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 616,
-											"top": 295,
+											"top": 311,
 											"width": 229,
 											"height": 13,
 											"alpha": -1.5789923083174364,
@@ -3121,7 +3155,7 @@
 											"visible": null,
 											"font": "Arial;13;0",
 											"left": 578,
-											"top": 294,
+											"top": 310,
 											"height": 13,
 											"alpha": 1.5707963267948966,
 											"distance": 30,
@@ -3142,7 +3176,7 @@
 											"visible": false,
 											"font": "Arial;13;0",
 											"left": 622,
-											"top": 295,
+											"top": 311,
 											"height": 13,
 											"alpha": -1.5707963267948966,
 											"distance": 15,
@@ -3159,7 +3193,7 @@
 									"tail": {
 										"$ref": "AAAAAAFztKsbo5Ihdss="
 									},
-									"points": "608:320;608:283",
+									"points": "608:336;608:298",
 									"showVisibility": true,
 									"nameLabel": {
 										"$ref": "AAAAAAFztQCmSJM5MKs="
@@ -3179,10 +3213,10 @@
 									},
 									"font": "Source Code Pro;13;0",
 									"left": 904,
-									"top": 16,
+									"top": 8,
 									"width": 953,
-									"height": 175,
-									"text": "valid sync frame detection criteria:\n \nvalid_sync_frame = (signal[frame_buffer][pulse_level].is_valid(MIN_PULSE_DURATION,MAX_PULSE_DURATION)\n                   &&\n                   (signal[frame_buffer][!pulse_level].is_valid(MIN_GAP_DURATION,MAX_GAP_DURATION)\n                   &&\n                   (signal[frame_buffer][!pulse_level].captures == (signal[frame_buffer][pulse_level].captures - 1))\n                   &&\n                   (signal[frame_buffer][0] == signal[0][0])\n                   &&\n                   (signal[frame_buffer][1] == signal[0][1]);"
+									"height": 205,
+									"text": "valid sync frame detection criteria:\n \nvalid_sync_frame = (signal[frame_buffer][pulse_level].is_valid(MIN_PULSE_DURATION,MAX_PULSE_DURATION)\n                   &&\n                   (signal[frame_buffer][!pulse_level].is_valid(MIN_GAP_DURATION,MAX_GAP_DURATION)\n                   &&\n                   (signal[frame_buffer][!pulse_level].captures == (signal[frame_buffer][pulse_level].captures - 1))\n                   &&\n                   (signal[frame_buffer][0] == signal[0][0])\n                   &&\n                   (signal[frame_buffer][1] == signal[0][1])\n                   &&\n                   (!signature.is_encoded() || signature.is_valid());"
 								},
 								{
 									"_type": "UMLNoteLinkView",
@@ -3198,33 +3232,7 @@
 										"$ref": "AAAAAAFztQXXUpNZy6o="
 									},
 									"lineStyle": 3,
-									"points": "1258:191;1024:360;811:359"
-								},
-								{
-									"_type": "UMLNoteView",
-									"_id": "AAAAAAFzvuPV9fh9HEg=",
-									"_parent": {
-										"$ref": "AAAAAAFzsBGozXTWKAA="
-									},
-									"font": "Source Code Pro;13;0",
-									"left": 1472,
-									"top": 832,
-									"width": 633,
-									"height": 972,
-									"text": "Signal data structures:\n  \nclass Signal\n{\npublic:\n    uint16_t min_duration;\n    uint16_t max_duration;\n    uint16_t sum_duration;\n    unit16_t durations[MAX_CHANNELS];\n    uint8_t  captures;\n \n    Signal()\n    {\n        reset();\n    }\n \n    inline void reset()\n    {\n        min_duration = 0xffff;\n        max_duration = 0;\n        sum_duration = 0;\n        durations = {0};\n        captures = 0;\n    }\n \n    inline void update(const uint16_t &signal_duration)\n    {\n        if (signal_duration < MIN_SYNC_DURATION)\n        {\n            min_duration = min(min_duration,signal_duration);\n            max_duration = max(max_duration,signal_duration);\n            sum_duration += signal_duration;\n \n            if (captures < MAX_CHANNELS)\n            {\n                durations[captures] = signal_duration;\n            }\n \n            captures++;\n        }\n    }\n \n    inline bool operator==(const Signal &ref)\n    {\n        return ARE_VERY_CLOSE(min_duration,ref.min_duration)\n               &&\n               ARE_VERY_CLOSE(max_duration,ref.max_duration)\n               &&\n               ARE_VERY_CLOSE(sum_duration,ref.sum_duration)\n               &&\n               (captures == ref.captures);\n    }\n \n    inline is_valid(const uint16_t &min_value, const uint16_t &max_value)\n    {\n        return IS_IN_RANGE(captures, MIN_CHANNELS, MAX_CHANNELS)\n               &&\n               IS_IN_RANGE(min_duration, min_value, max_value)\n               &&\n               IS_IN_RANGE(max_duration, min_value, max_value)\n               &&\n               IS_IN_RANGE(sum_duration / captures, min_value, max_value);\n    }\n};\n"
-								},
-								{
-									"_type": "UMLNoteView",
-									"_id": "AAAAAAFzvubdb/iWIyI=",
-									"_parent": {
-										"$ref": "AAAAAAFzsBGozXTWKAA="
-									},
-									"font": "Source Code Pro;13;0",
-									"left": 544,
-									"top": 856,
-									"width": 873,
-									"height": 2039,
-									"text": "Signature data structure:\n \n#define MAX_SUPERINPOSED_CHANNELS 11\n \n#define MIN_CODE_THRESHOLD        300\n#define MAX_CODE_THRESHOLD        460\n#define CODE_THRESHOLD_STEP       ((MAX_CODE_THRESHOLD-MIN_CODE_THRESHOLD)/4)\n \n#define CODE_THRESHOLD_00         (MIN_CODE_THRESHOLD + CODE_THRESHOLD_STEP)\n#define CODE_THRESHOLD_01         (CODE_THRESHOLD_00  + CODE_THRESHOLD_STEP)\n#define CODE_THRESHOLD_10         (CODE_THRESHOLD_01  + CODE_THRESHOLD_STEP)\n \nclass Signature\n{\npublic:\n    uint8_t  tx_id;\n    uint8_t  rx_sub_id;\n    uint8_t  scan;\n  \n    Signature(const uint8_t &rx_id)\n        : _rx_id        (rx_id)\n        , _paired_tx_id (0)  // until paired all transmitters are valid\n    {}\n \n    inline void update(const Signal &pulse)\n    {\n        if (pulse.captures <= MAX_SUPERINPOSED_CHANNELS)\n        {\n            // collect data\n            //\n            uint8_t &pulse_duration = pulse.duration[pulse.captures-1];\n            uint8_t bit_index       = ( ( pulse.captures - 1 ) << 1 );\n \n            if (IS_IN_RANGE(pulse_duration,MIN_CODE_THESHOLD,MAX_CODE_THRESHOLD))\n            {\n                // clear the bits\n                //\n                _raw_bits &= ~( 0x11 << bit_index );\n \n                if (pulse_duration >= CODE_THRESHOLD_10)\n                {\n                    _raw_bits |= ( 0x11 << bit_index ); \n                }\n                else\n                if (pulse_duration >= CODE_THRESHOLD_01)\n                {\n                    _raw_bits |= ( 0x10 << bit_index ); \n                }\n                else\n                if (pulse_duration >= CODE_THRESHOLD_00)\n                {\n                    _raw_bits |= ( 0x01 << bit_index ); \n                }\n            }\n            else\n            {\n                // invalid data -> invalidate signature\n                //\n                _raw_bits = 0;\n            }\n        }\n        else\n        if (pulse.caputures == MAX_SUPERINPOSED_CHANNELS)\n        {\n            _valid = ( ( ( _raw_bits >>  0 ) & 0x01 ) ^\n                       ( ( _raw_bits >>  2 ) & 0x01 ) ^  \n                       ( ( _raw_bits >>  4 ) & 0x01 ) ^  \n                       ( ( _raw_bits >>  6 ) & 0x01 ) ^  \n                       ( ( _raw_bits >>  8 ) & 0x01 ) ^  \n                       ( ( _raw_bits >> 10 ) & 0x01 ) ^  \n                       ( ( _raw_bits >> 12 ) & 0x01 ) ^  \n                       ( ( _raw_bits >> 14 ) & 0x01 ) ^\n                       ( ( _raw_bits >> 17 ) & 0x01 ) ) // tx_parity_bit\n                     &&\n                     ( ( ( _raw_bits >>  1 ) & 0x01 ) ^\n                       ( ( _raw_bits >>  3 ) & 0x01 ) ^  \n                       ( ( _raw_bits >>  5 ) & 0x01 ) ^  \n                       ( ( _raw_bits >>  7 ) & 0x01 ) ^\n                       ( ( _raw_bits >>  9 ) & 0x01 ) ^  \n                       ( ( _raw_bits >> 11 ) & 0x01 ) ^  \n                       ( ( _raw_bits >> 13 ) & 0x01 ) ^  \n                       ( ( _raw_bits >> 15 ) & 0x01 ) ^\n                       ( ( _raw_bits >> 19 ) & 0x01 ) ) // rx_parity_bit\n                     &&\n                     ( ( ( _raw_bits >> 16 ) & 0x01 ) ^  \n                       ( ( _raw_bits >> 18 ) & 0x01 ) ^  \n                       ( ( _raw_bits >> 20 ) & 0x01 ) ^\n                       ( ( _raw_bits >> 21 ) & 0x01 ) ) // scan_parity_bit\n                     ;\n\n            if (_valid)\n            {\n                uint8_t rx_id;\n\n                // extract fields\n                //\n                tx_id     = ( ( ( _raw_bits >>  0 ) & 0x01 ) << 0 ) ||\n                            ( ( ( _raw_bits >>  2 ) & 0x01 ) << 1 ) ||  \n                            ( ( ( _raw_bits >>  4 ) & 0x01 ) << 2 ) ||  \n                            ( ( ( _raw_bits >>  6 ) & 0x01 ) << 3 ) ||  \n                            ( ( ( _raw_bits >>  8 ) & 0x01 ) << 4 ) ||  \n                            ( ( ( _raw_bits >> 10 ) & 0x01 ) << 5 ) ||  \n                            ( ( ( _raw_bits >> 12 ) & 0x01 ) << 6 ) ||\n                            ( ( ( _raw_bits >> 14 ) & 0x01 ) << 7 )  ; \n \n                rx_id     = ( ( ( _raw_bits >>  1 ) & 0x01 ) << 0 ) ||\n                            ( ( ( _raw_bits >>  3 ) & 0x01 ) << 1 ) ||  \n                            ( ( ( _raw_bits >>  5 ) & 0x01 ) << 2 ) ||  \n                            ( ( ( _raw_bits >>  7 ) & 0x01 ) << 3 )  ;\n \n                rx_sub_id = ( ( ( _raw_bits >>  9 ) & 0x01 ) << 0 ) ||  \n                            ( ( ( _raw_bits >> 11 ) & 0x01 ) << 1 ) ||  \n                            ( ( ( _raw_bits >> 13 ) & 0x01 ) << 2 ) ||  \n                            ( ( ( _raw_bits >> 15 ) & 0x01 ) << 3 )  ; \n  \n                scan      = ( ( ( _raw_bits >> 16 ) & 0x01 ) << 0 ) ||  \n                            ( ( ( _raw_bits >> 18 ) & 0x01 ) << 1 ) ||  \n                            ( ( ( _raw_bits >> 20 ) & 0x01 ) << 2 )  ;\n \n                // It's really valid only if it is for me and comes from the paired tx\n                //\n                _valid = ( rx_id == _rx_id ) && ( tx_id == ( tx_id ^ _paired_tx_id ) );\n            }\n        }\n        else\n        {\n            // too much fields -> invalidate signature\n            //\n            _raw_bits = 0;\n        }\n    }\n \nprivate:\n    uint8_t  _rx_id;\n    uint32_t _raw_bits;\n    uint8_t  _paired_tx_id;\n};"
+									"points": "1233:213;1024:360;811:370"
 								}
 							]
 						}
@@ -3309,6 +3317,14 @@
 									"doActivities": [
 										{
 											"_type": "UMLActivity",
+											"_id": "AAAAAAFzxEY2HwW3rBY=",
+											"_parent": {
+												"$ref": "AAAAAAFzsBJj9HUCItw="
+											},
+											"name": "[sync_detected]: signature.reset()"
+										},
+										{
+											"_type": "UMLActivity",
 											"_id": "AAAAAAFzsN2yMHjJIy8=",
 											"_parent": {
 												"$ref": "AAAAAAFzsBJj9HUCItw="
@@ -3388,6 +3404,14 @@
 												"$ref": "AAAAAAFztKsbo5Igh+4="
 											},
 											"name": "[sync_detected && valid_sync_frame]: sync_cycles++"
+										},
+										{
+											"_type": "UMLActivity",
+											"_id": "AAAAAAFzxEQrSQWu35I=",
+											"_parent": {
+												"$ref": "AAAAAAFztKsbo5Igh+4="
+											},
+											"name": "[sync_detected && valid_sync_frame && frame_buffer==0]: signature.pair()"
 										},
 										{
 											"_type": "UMLActivity",
