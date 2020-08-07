@@ -357,7 +357,7 @@ void Failsafe()
 
     if (!(Flags & (1<<GOT_FS)))
     {
-        goto    no_signal;
+        no_signal;
     }
 
     for (uint8_t ch=0; ch<MAX_CHANNELS; ch++)

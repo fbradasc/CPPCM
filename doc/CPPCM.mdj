@@ -429,7 +429,7 @@
 													"top": 266,
 													"width": 260,
 													"height": 13,
-													"text": "do/[sync_detected]: signal[*][*].reset()",
+													"text": "do/[sync_detected]: ppmsum[*].reset()",
 													"horizontalAlignment": 0
 												},
 												{
@@ -2785,11 +2785,11 @@
 										"$ref": "AAAAAAFzsBGozXTWKAA="
 									},
 									"font": "Source Code Pro;13;0",
-									"left": 976,
-									"top": 416,
+									"left": 920,
+									"top": 384,
 									"width": 777,
 									"height": 250,
-									"text": "common oprations to all states:\n \nstatic Signal signal[2][2];\nstatic Signature signature(MY_RX_ID);\n \nsignal_level=PIN_LEVEL;\nsignal_duration = current_capture_time = TIMER;\n[last_capture_time>current_capture_time]: signal_duration += (MAX_DURATION-last_capture_time);\n[last_capture_time<=current_capture_time]: signal_duration -= last_capture_time;\nlast_capture_time=current_capture_time;\n \nsignal[frame_buffer][signal_level].update(signal_duration);\n \n[pulse_level == signal_level]: signature.update(signal[frame_buffer][signal_level]);\n \nsync_detected = IS_IN_RANGE(signal_duration, MIN_SYNC_DURATION, MAX_SYNC_DURATION);"
+									"text": "common oprations to all states:\n \nstatic PPMSum ppmsum[2];\nstatic Signature signature(MY_RX_ID);\n \nsignal_level = PIN_LEVEL;\nsignal_width = current_capture_time = TIMER;\n[last_capture_time>current_capture_time]: signal_width += (MAX_TIMER_VALUE-last_capture_time);\n[last_capture_time<=current_capture_time]: signal_width -= last_capture_time;\nlast_capture_time=current_capture_time;\n \nppmsum[frame_buffer].update(signal_level, signal_width);\n \n[pulse_level == signal_level]: signature.update(ppmsum[frame_buffer].signal(signal_level));\n \nsync_detected = IS_IN_RANGE(signal_width, MIN_SYNC_WIDTH, MAX_SYNC_WIDTH);"
 								},
 								{
 									"_type": "UMLStateView",
@@ -2957,7 +2957,7 @@
 													"top": 411,
 													"width": 456.5302734375,
 													"height": 13,
-													"text": "do/[sync_detected && valid_sync_frame]: signal[frame_buffer][*].reset()",
+													"text": "do/[sync_detected && valid_sync_frame]: ppmsum[frame_buffer].reset()",
 													"horizontalAlignment": 0
 												}
 											],
@@ -3214,9 +3214,9 @@
 									"font": "Source Code Pro;13;0",
 									"left": 904,
 									"top": 8,
-									"width": 953,
-									"height": 205,
-									"text": "valid sync frame detection criteria:\n \nvalid_sync_frame = (signal[frame_buffer][pulse_level].is_valid(MIN_PULSE_DURATION,MAX_PULSE_DURATION)\n                   &&\n                   (signal[frame_buffer][!pulse_level].is_valid(MIN_GAP_DURATION,MAX_GAP_DURATION)\n                   &&\n                   (signal[frame_buffer][!pulse_level].captures == (signal[frame_buffer][pulse_level].captures - 1))\n                   &&\n                   (signal[frame_buffer][0] == signal[0][0])\n                   &&\n                   (signal[frame_buffer][1] == signal[0][1])\n                   &&\n                   (!signature.is_encoded() || signature.is_valid());"
+									"width": 577,
+									"height": 85,
+									"text": "valid sync frame detection criteria:\n \nvalid_sync_frame = ppmsum[frame_buffer].is_valid_sync_frame()\n                   &&\n                   (!signature.is_encoded() || signature.is_valid());"
 								},
 								{
 									"_type": "UMLNoteLinkView",
@@ -3232,7 +3232,7 @@
 										"$ref": "AAAAAAFztQXXUpNZy6o="
 									},
 									"lineStyle": 3,
-									"points": "1233:213;1024:360;811:370"
+									"points": "1169:93;1024:360;811:370"
 								}
 							]
 						}
@@ -3329,7 +3329,7 @@
 											"_parent": {
 												"$ref": "AAAAAAFzsBJj9HUCItw="
 											},
-											"name": "[sync_detected]: signal[*][*].reset()"
+											"name": "[sync_detected]: ppmsum[*].reset()"
 										},
 										{
 											"_type": "UMLActivity",
@@ -3427,7 +3427,7 @@
 											"_parent": {
 												"$ref": "AAAAAAFztKsbo5Igh+4="
 											},
-											"name": "[sync_detected && valid_sync_frame]: signal[frame_buffer][*].reset()"
+											"name": "[sync_detected && valid_sync_frame]: ppmsum[frame_buffer].reset()"
 										}
 									]
 								}

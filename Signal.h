@@ -3,8 +3,6 @@
 
 #include "cppm.h"
 
-#include <inttypes.h>
-
 #define MAX_DELTA 0
 
 #if MAX_DELTA==0
@@ -18,37 +16,54 @@
 class Signal
 {
 public:
-    uint16_t min_duration;
-    uint16_t max_duration;
-    uint16_t sum_duration;
-    unit16_t durations[MAX_CHANNELS];
+    uint16_t min_width;
+    uint16_t max_width;
+    uint16_t sum_width;
+    unit16_t widths[MAX_CHANNELS];
     uint8_t  captures;
+
+    Signal(const Signal& ref)
+    {
+        *this = ref;
+    }
 
     Signal()
     {
         reset();
     }
 
+    inline Singal &operator=(const Signal &ref)
+    {
+        min_width = ref.min_width;
+        max_width = ref.max_width;
+        sum_width = ref.sum_width;
+        captures  = ref.captures ;
+
+        memcpy(widths, ref.widths, sizeof(widths));
+
+        return *this;
+    }
+
     inline void reset()
     {
-        min_duration = 0xffff;
-        max_duration = 0;
-        sum_duration = 0;
-        memset(durations, 0, sizeof(durations));
+        min_width = 0xffff;
+        max_width = 0;
+        sum_width = 0;
+        memset(widths, 0, sizeof(widths));
         captures = 0;
     }
 
-    inline void update(const uint16_t &signal_duration)
+    inline void update(const uint16_t &signal_width)
     {
-        if (signal_duration < MIN_SYNC_WIDTH)
+        if (signal_width < MIN_SYNC_WIDTH)
         {
-            min_duration = min(min_duration,signal_duration);
-            max_duration = max(max_duration,signal_duration);
-            sum_duration += signal_duration;
+            min_width = min(min_width,signal_width);
+            max_width = max(max_width,signal_width);
+            sum_width += signal_width;
 
             if (captures < MAX_CHANNELS)
             {
-                durations[captures] = signal_duration;
+                widths[captures] = signal_width;
             }
 
             captures++;
@@ -57,11 +72,11 @@ public:
 
     inline bool operator==(const Signal &ref)
     {
-        return ARE_VERY_CLOSE(min_duration,ref.min_duration)
+        return ARE_VERY_CLOSE(min_width,ref.min_width)
                &&
-               ARE_VERY_CLOSE(max_duration,ref.max_duration)
+               ARE_VERY_CLOSE(max_width,ref.max_width)
                &&
-               ARE_VERY_CLOSE(sum_duration,ref.sum_duration)
+               ARE_VERY_CLOSE(sum_width,ref.sum_width)
                &&
                (captures == ref.captures);
     }
@@ -70,11 +85,11 @@ public:
     {
         return IS_IN_RANGE(captures, MIN_CHANNELS, MAX_CHANNELS)
                &&
-               IS_IN_RANGE(min_duration, min_value, max_value)
+               IS_IN_RANGE(min_width, min_value, max_value)
                &&
-               IS_IN_RANGE(max_duration, min_value, max_value)
+               IS_IN_RANGE(max_width, min_value, max_value)
                &&
-               IS_IN_RANGE(sum_duration / captures, min_value, max_value);
+               IS_IN_RANGE(sum_width / captures, min_value, max_value);
     }
 };
 

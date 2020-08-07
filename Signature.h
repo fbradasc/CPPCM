@@ -1,8 +1,6 @@
 #if !defined(__SIGNATURE_H__)
 #define __SIGNATURE_H__
 
-#include <inttypes.h>
-
 #include "Signal.h"
 
 #define MAX_SUPERINPOSED_CHANNELS 11
@@ -47,9 +45,9 @@ public:
         {
             // collect data
             //
-            uint8_t &pulse_duration = pulse.duration[pulse.captures-1];
+            uint8_t &pulse_width = pulse.width[pulse.captures-1];
 
-            if (IS_IN_RANGE(pulse_duration,MIN_CODE_THRESHOLD,MAX_CODE_THRESHOLD))
+            if (IS_IN_RANGE(pulse_width,MIN_CODE_THRESHOLD,MAX_CODE_THRESHOLD))
             {
                 // It's a valid pulse with superinposed code
                 //
@@ -61,17 +59,17 @@ public:
 
                 // set the bits
                 //
-                if (pulse_duration >= CODE_THRESHOLD_10)
+                if (pulse_width >= CODE_THRESHOLD_10)
                 {
                     _raw_bits |= (0x11 << bit_index);
                 }
                 else
-                if (pulse_duration >= CODE_THRESHOLD_01)
+                if (pulse_width >= CODE_THRESHOLD_01)
                 {
                     _raw_bits |= (0x10 << bit_index);
                 }
                 else
-                if (pulse_duration >= CODE_THRESHOLD_00)
+                if (pulse_width >= CODE_THRESHOLD_00)
                 {
                     _raw_bits |= (0x01 << bit_index);
                 }
@@ -92,7 +90,7 @@ public:
 
             // We have reached the maximum number of coded pulses
             //
-            _encoded = ! ARE_VERY_CLOSE(_pulse.min_duration, _pulse.max_duration)
+            _encoded = ! ARE_VERY_CLOSE(_pulse.min_width, _pulse.max_width)
                        &&
                        ( _raw_bits != INVALID_PATTERN_00 )
                        &&
