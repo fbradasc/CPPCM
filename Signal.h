@@ -32,7 +32,7 @@ public:
         reset();
     }
 
-    inline Singal &operator=(const Signal &ref)
+    inline Signal &operator=(const Signal &ref)
     {
         min_width = ref.min_width;
         max_width = ref.max_width;
@@ -90,6 +90,11 @@ public:
                IS_IN_RANGE(max_width, min_value, max_value)
                &&
                IS_IN_RANGE(sum_width / captures, min_value, max_value);
+    }
+
+    inline uint16_t get_last_width()
+    {
+        return (captures > 0) ? widths[captures-1] : 0;
     }
 };
 

@@ -273,7 +273,7 @@
 													},
 													"visible": false,
 													"font": "Arial;13;0",
-													"left": -348,
+													"left": -428,
 													"top": -220,
 													"height": 13
 												},
@@ -284,9 +284,9 @@
 														"$ref": "AAAAAAFzsBJj9HUE9+k="
 													},
 													"font": "Arial;13;1",
-													"left": 445,
+													"left": 405,
 													"top": 183,
-													"width": 260,
+													"width": 338,
 													"height": 13,
 													"text": "SyncSearch"
 												},
@@ -298,7 +298,7 @@
 													},
 													"visible": false,
 													"font": "Arial;13;0",
-													"left": -348,
+													"left": -428,
 													"top": -220,
 													"width": 38,
 													"height": 13,
@@ -312,7 +312,7 @@
 													},
 													"visible": false,
 													"font": "Arial;13;0",
-													"left": 449,
+													"left": 369,
 													"top": 174,
 													"width": 267,
 													"height": 13,
@@ -320,9 +320,9 @@
 												}
 											],
 											"font": "Arial;13;0",
-											"left": 440,
+											"left": 400,
 											"top": 176,
-											"width": 270,
+											"width": 348,
 											"height": 25,
 											"stereotypeLabel": {
 												"$ref": "AAAAAAFzsBJj9HUFQac="
@@ -357,11 +357,11 @@
 														"$ref": "AAAAAAFzsD1px3evaNE="
 													},
 													"font": "Arial;13;0",
-													"left": 445,
+													"left": 405,
 													"top": 206,
-													"width": 260,
+													"width": 338,
 													"height": 13,
-													"text": "entry/pulse_level=HIGH",
+													"text": "entry/PPMSum::reset_pulse_level()",
 													"horizontalAlignment": 0
 												},
 												{
@@ -374,9 +374,9 @@
 														"$ref": "AAAAAAFztMupk5LRs2Y="
 													},
 													"font": "Arial;13;0",
-													"left": 445,
+													"left": 405,
 													"top": 221,
-													"width": 260,
+													"width": 338,
 													"height": 13,
 													"text": "entry/sync_cycles=0",
 													"horizontalAlignment": 0
@@ -391,9 +391,9 @@
 														"$ref": "AAAAAAFztNjTZ5L6q3E="
 													},
 													"font": "Arial;13;0",
-													"left": 445,
+													"left": 405,
 													"top": 236,
-													"width": 260,
+													"width": 338,
 													"height": 13,
 													"text": "entry/frame_buffer=0",
 													"horizontalAlignment": 0
@@ -408,9 +408,9 @@
 														"$ref": "AAAAAAFzxEY2HwW3rBY="
 													},
 													"font": "Arial;13;0",
-													"left": 445,
+													"left": 405,
 													"top": 251,
-													"width": 260,
+													"width": 338,
 													"height": 13,
 													"text": "do/[sync_detected]: signature.reset()",
 													"horizontalAlignment": 0
@@ -425,9 +425,9 @@
 														"$ref": "AAAAAAFzsN2yMHjJIy8="
 													},
 													"font": "Arial;13;0",
-													"left": 445,
+													"left": 405,
 													"top": 266,
-													"width": 260,
+													"width": 338,
 													"height": 13,
 													"text": "do/[sync_detected]: ppmsum[*].reset()",
 													"horizontalAlignment": 0
@@ -442,18 +442,18 @@
 														"$ref": "AAAAAAFztLvO2JKg2C8="
 													},
 													"font": "Arial;13;0",
-													"left": 445,
+													"left": 405,
 													"top": 281,
-													"width": 260,
+													"width": 338,
 													"height": 13,
-													"text": "do/[sync_detected]: pulse_level=signal_level",
+													"text": "do/[sync_detected]: PPSum::set_pulse_level(signal_level)",
 													"horizontalAlignment": 0
 												}
 											],
 											"font": "Arial;13;0",
-											"left": 440,
+											"left": 400,
 											"top": 201,
-											"width": 270,
+											"width": 348,
 											"height": 98
 										},
 										{
@@ -467,7 +467,7 @@
 											},
 											"visible": false,
 											"font": "Arial;13;0",
-											"left": -174,
+											"left": -214,
 											"top": -110,
 											"width": 10,
 											"height": 10
@@ -482,16 +482,16 @@
 												"$ref": "AAAAAAFzsBJj9HUCItw="
 											},
 											"font": "Arial;13;0",
-											"left": 440,
+											"left": 400,
 											"top": 299,
-											"width": 270
+											"width": 348
 										}
 									],
 									"font": "Arial;13;0",
 									"containerChangeable": true,
-									"left": 440,
+									"left": 400,
 									"top": 176,
-									"width": 270,
+									"width": 348,
 									"height": 123,
 									"nameCompartment": {
 										"$ref": "AAAAAAFzsBJj9HUE9+k="
@@ -2485,7 +2485,7 @@
 										"$ref": "AAAAAAFzsCo5snbdhD0="
 									},
 									"lineStyle": 3,
-									"points": "770:619;1064:232;710:236",
+									"points": "770:619;1064:232;748:235",
 									"showVisibility": true,
 									"nameLabel": {
 										"$ref": "AAAAAAFzsCwIhHctddU="
@@ -2788,8 +2788,8 @@
 									"left": 920,
 									"top": 384,
 									"width": 777,
-									"height": 250,
-									"text": "common oprations to all states:\n \nstatic PPMSum ppmsum[2];\nstatic Signature signature(MY_RX_ID);\n \nsignal_level = PIN_LEVEL;\nsignal_width = current_capture_time = TIMER;\n[last_capture_time>current_capture_time]: signal_width += (MAX_TIMER_VALUE-last_capture_time);\n[last_capture_time<=current_capture_time]: signal_width -= last_capture_time;\nlast_capture_time=current_capture_time;\n \nppmsum[frame_buffer].update(signal_level, signal_width);\n \n[pulse_level == signal_level]: signature.update(ppmsum[frame_buffer].signal(signal_level));\n \nsync_detected = IS_IN_RANGE(signal_width, MIN_SYNC_WIDTH, MAX_SYNC_WIDTH);"
+									"height": 177,
+									"text": "common oprations to all states:\n\nstatic Signature signature(MY_RX_ID); \nstatic PPMSum ppmsum[2] = { signature, signature };\n \nsignal_level = PIN_LEVEL;\nsignal_width = current_capture_time = TIMER;\n[last_capture_time>current_capture_time]: signal_width += (MAX_TIMER_VALUE-last_capture_time);\n[last_capture_time<=current_capture_time]: signal_width -= last_capture_time;\nlast_capture_time=current_capture_time;\n \nsync_detected = ppmsum[frame_buffer].update(signal_level, signal_width);"
 								},
 								{
 									"_type": "UMLStateView",
@@ -3295,7 +3295,7 @@
 											"_parent": {
 												"$ref": "AAAAAAFzsBJj9HUCItw="
 											},
-											"name": "pulse_level=HIGH"
+											"name": "PPMSum::reset_pulse_level()"
 										},
 										{
 											"_type": "UMLActivity",
@@ -3337,7 +3337,7 @@
 											"_parent": {
 												"$ref": "AAAAAAFzsBJj9HUCItw="
 											},
-											"name": "[sync_detected]: pulse_level=signal_level"
+											"name": "[sync_detected]: PPSum::set_pulse_level(signal_level)"
 										}
 									]
 								},
