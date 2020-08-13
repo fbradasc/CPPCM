@@ -1,81 +1,49 @@
-#ifndef CPPCM_H
-#define CPPCM_H
+#if !defined(__CPPM_CONFIG_H__)
+#define __CPPM_CONFIG_H__
 
 #include <inttypes.h>
-#include <avr/interrupt.h>
 
-#define CPPCM_MAX_CHANNELS 16
+#define MAX_DELTA             0
 
-// number of consecutive good frames required at startup.
-//
-#define GOOD_FRAMES_COUNT 10
+#define MIN_CHANNELS          4
+#define MAX_CHANNELS          16
 
-// number of consecutive bad frames accepted without going to failsafe.
-//
-#define HOLD_FRAMES_COUNT 25
+#define GUARD_US              25
 
-// number of consecutive low throttle frames required before arming.
-//
-#define	ARM_FRAMES_COUNT 10
+#define MIN_CHANNEL_WIDTH_US  976
+#define MAX_CHANNEL_WIDTH_US  2000
 
-#define FAILSAFE_BUFFER_BIT 1
+#define MIN_SYNC_WIDTH_US     2500
 
-ISR(TIMER1_CAPT_vect);
+#define MIN_PULSE_WIDTH_US    300
 
-class CPPCMDsr
-{
-public:
-    enum Mode
-    {
-        SYNC_SEARCH,
-        CHANNELS_CAPTURE
-    };
+#define MAX_TIMER_VALUE       0xffff
 
-    CPPCMDsr(uint8_t bits_per_pulses)
-        : _good_frames       (GOOD_FRAMES_COUNT)
-	    , _hold_frames       (HOLD_FRAMES_COUNT)
-        , _arm_frames        (ARM_FRAMES_COUNT )
-        , _buffer            (0)
-        , _mode              (SYNC_SEARCH)
-        , _synced            (false)
-        , _got_failsafe_frame(false)
-        , _pulse_level       (true) // PPM with positive shift by default
-        , _bits_per_pulses   (bits_per_pulses)
-    {
-    }
+#define USEC_TO_WIDTH(us)     (us) // TODO
 
-    void    start   (void);
-    void    stop    (void);
-    bool    ok      (void);
-    uint8_t channels(void);
-    void    read    (int16_t *values);
+#define MAX_PULSE_WIDTH_US    ( MIN_CHANNEL_WIDTH_US - MIN_PULSE_WIDTH_US - 2 * GUARD_US )
 
-    friend void TIMER1_CAPT_vect();
+// #define MAX_SYNC_WIDTH_US     ( ( MIN_CHANNEL_WIDTH_US * ( MAX_CHANNELS - 4 ) ) + MIN_SYNC_WIDTH_US )
+#define MAX_SYNC_WIDTH_US     ( ( ( MAX_CHANNEL_WIDTH_US + GUARD_US ) * MAX_CHANNELS ) + MIN_SYNC_WIDTH_US )
 
-private:
-    volatile struct Flags
-    {
-        bool _synced            : 1;
-        bool _got_failsafe_frame: 1;
-        bool _pulse_level       : 1;
-    };
+#define MIN_PULSE_WIDTH       USEC_TO_WIDTH( MIN_PULSE_WIDTH_US - GUARD_US )
+#define MAX_PULSE_WIDTH       USEC_TO_WIDTH( MAX_PULSE_WIDTH_US + GUARD_US )
 
-    volatile uint8_t  _good_frames; // Number of good frames to go before
-                                    // accepting failsafe frame.
-	volatile uint8_t  _hold_frames; // Number of bad frames to go before going
-                                    // to failsafe
-    volatile uint8_t  _arm_frames;  // Number of low throttle frames to go
-                                    // before arming throttle.
-    volatile uint8_t  _channels;
-    volatile uint8_t  _buffer;
-    volatile Mode     _mode;
-    volatile int16_t  _servos[2][CPPCM_MAX_CHANNELS];
-    volatile int16_t  _safety[CPPCM_MAX_CHANNELS];
-    volatile int16_t  _pulses[CPPCM_MAX_CHANNELS];
-    volatile uint8_t  _throttle_channel;
-    volatile uint8_t  _bits_per_pulses;
-};
+#define MIN_GAP_WIDTH         USEC_TO_WIDTH( MIN_CHANNEL_WIDTH_US - MAX_PULSE_WIDTH_US - GUARD_US)
+#define MAX_GAP_WIDTH         USEC_TO_WIDTH( MAX_CHANNEL_WIDTH_US - MIN_PULSE_WIDTH_US + GUARD_US)
 
-extern CPPCMDsr CPPCM;
+#define MIN_CHANNEL_WIDTH     USEC_TO_WIDTH( MIN_CHANNEL_WIDTH_US - GUARD_US)
+#define MAX_CHANNEL_WIDTH     USEC_TO_WIDTH( MAX_CHANNEL_WIDTH_US + GUARD_US)
 
+#define MIN_SYNC_WIDTH        USEC_TO_WIDTH( MIN_SYNC_WIDTH_US )
+#define MAX_SYNC_WIDTH        USEC_TO_WIDTH( MAX_SYNC_WIDTH_US )
+
+#if MAX_DELTA==0
+#define ARE_VERY_CLOSE(a,b) ((a)==(b))
+#else
+#define ARE_VERY_CLOSE(a,b) ((((a)>(b)) ? (a)-(b) : (b)-(a)) <= MAX_DELTA)
 #endif
+
+#define IS_IN_RANGE(cval,vmin,vmax) (((cval)>=(vmin)) && ((cval)<=(vmax)))
+
+#endif // __CPPM_CONFIG_H__

@@ -1,7 +1,7 @@
 #if !defined(__SIGNATURE_H__)
 #define __SIGNATURE_H__
 
-#include "Signal.h"
+#include "CPPCM.h"
 
 #define MAX_SUPERINPOSED_CHANNELS 11
 
@@ -20,10 +20,10 @@
 
 #define BIT_VAL(word,bit_pos)     (((word) >> (bit_pos)) & 0x01)
 
-class Signature
+class PPMTag
 {
 public:
-    Signature(const uint8_t &rx_id)
+    PPMTag(const uint8_t &rx_id)
         : _rx_id        (rx_id)
         , _raw_bits     (0)
         , _paired_tx_id (0)  // until paired all transmitters are valid
@@ -39,19 +39,17 @@ public:
         _encoded      = false;
     }
 
-    inline void update(const Signal &pulse)
+    inline void update(const uint8_t &captures, const uint16_t &pulse_width)
     {
-        if ((pulse.captures > 0) && (pulse.captures <= MAX_SUPERINPOSED_CHANNELS))
+        if (captures <= MAX_SUPERINPOSED_CHANNELS)
         {
             // collect data
             //
-            uint8_t &pulse_width = pulse.width[pulse.captures-1];
-
             if (IS_IN_RANGE(pulse_width,MIN_CODE_THRESHOLD,MAX_CODE_THRESHOLD))
             {
                 // It's a valid pulse with superinposed code
                 //
-                uint8_t bit_index = ((pulse.captures-1) << 1);
+                uint8_t bit_index = (captures << 1);
 
                 // clear the bits
                 //
@@ -76,13 +74,13 @@ public:
             }
             else
             {
-                // invalid data -> invalidate signature
+                // invalid data -> invalidate the tag
                 //
                 _raw_bits = 0;
             }
         }
         else
-        if (pulse.caputures == MAX_SUPERINPOSED_CHANNELS)
+        if (captures == MAX_SUPERINPOSED_CHANNELS)
         {
             bool valid = false;
 
@@ -214,7 +212,7 @@ public:
         }
         else
         {
-            // too much fields -> invalidate signature
+            // too much fields -> invalidate the tag
             //
             _raw_bits = 0;
             _valid    = false;
@@ -222,7 +220,7 @@ public:
         }
     }
 
-    inline void pair()
+    inline void entangle()
     {
         if (_valid)
         {

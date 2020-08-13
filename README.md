@@ -34,14 +34,14 @@ superimpose to each frame a digital code of up to 2*(channels+1) bits.
 The width of each pulse is 0.3 to 0.46 mS (300 to 460 uS) allowing to superimpose
 2 bits each pulse, as for the following table:
 
-+------------------++-------+-------++-------+
-| Pulse width (us) || bit 1 | bit 0 || Value |
-+------------------++-------+-------++-------+
-| 300 <= x <  340  ||   0   |   0   ||   0   |
-| 340 <= x <  380  ||   0   |   1   ||   1   |
-| 380 <= x <  420  ||   1   |   0   ||   2   |
-| 420 <= x <= 460  ||   1   |   1   ||   3   |
-+------------------++-------+-------++-------+
+    +------------------++-------+-------++-------+
+    | Pulse width (us) || bit 1 | bit 0 || Value |
+    +------------------++-------+-------++-------+
+    | 300 <= x <  340  ||   0   |   0   ||   0   |
+    | 340 <= x <  380  ||   0   |   1   ||   1   |
+    | 380 <= x <  420  ||   1   |   0   ||   2   |
+    | 420 <= x <= 460  ||   1   |   1   ||   3   |
+    +------------------++-------+-------++-------+
 
 The width of each channel is 0.976 to 2 mS (1.488 mS when sticks centered).
 
@@ -97,22 +97,3 @@ servo jitter on weak signals.
 On receiving a sufficient number of good frames we save it for fail safe. 
 Then, if the signal is corrupted for too long, we output the fail safe frame
 instead of the last good frame.  
-
-## THROTTLE ARMING
-
-When entering fail safe the throttle is cut, and it will not be restarted 
-until a good signal is detected AND the throttle is manually reset. This 
-should prevent the situation where motor-induced RF interference causes 
-the decoder to cycle in and out of fail safe repeatedly.  
-
-For this feature to work the throttle channel has to be determined. Futaba 
-and Hitec transmitters assign the throttle to channel 3. JR, Airtronics and 
-GWS use channel 1. 
-
-Some ESC's need to have the throttle set to maximum at startup, perhaps to 
-disable the brake or to enter programming mode. Therefore, channel 1 is 
-designated as throttle if it measures less than 1.3mS or more than 1.7mS at 
-startup, otherwise channel 3 is assumed. 
-
-The throttle channel is forced to 1.05mS during fail safe, rather than set
-to its fail safe value, in case that value was full throttle! 

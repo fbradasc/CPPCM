@@ -286,7 +286,7 @@
 													"font": "Arial;13;1",
 													"left": 405,
 													"top": 183,
-													"width": 338,
+													"width": 339,
 													"height": 13,
 													"text": "SyncSearch"
 												},
@@ -322,7 +322,7 @@
 											"font": "Arial;13;0",
 											"left": 400,
 											"top": 176,
-											"width": 348,
+											"width": 349,
 											"height": 25,
 											"stereotypeLabel": {
 												"$ref": "AAAAAAFzsBJj9HUFQac="
@@ -359,9 +359,9 @@
 													"font": "Arial;13;0",
 													"left": 405,
 													"top": 206,
-													"width": 338,
+													"width": 339,
 													"height": 13,
-													"text": "entry/PPMSum::reset_pulse_level()",
+													"text": "entry/ppmsum.reset_pulse_level()",
 													"horizontalAlignment": 0
 												},
 												{
@@ -376,43 +376,9 @@
 													"font": "Arial;13;0",
 													"left": 405,
 													"top": 221,
-													"width": 338,
+													"width": 339,
 													"height": 13,
 													"text": "entry/sync_cycles=0",
-													"horizontalAlignment": 0
-												},
-												{
-													"_type": "UMLInternalActivityView",
-													"_id": "AAAAAAFztNjToJL9LNM=",
-													"_parent": {
-														"$ref": "AAAAAAFzsBJj9HUJza4="
-													},
-													"model": {
-														"$ref": "AAAAAAFztNjTZ5L6q3E="
-													},
-													"font": "Arial;13;0",
-													"left": 405,
-													"top": 236,
-													"width": 338,
-													"height": 13,
-													"text": "entry/frame_buffer=0",
-													"horizontalAlignment": 0
-												},
-												{
-													"_type": "UMLInternalActivityView",
-													"_id": "AAAAAAFzxEY2UAW6hpA=",
-													"_parent": {
-														"$ref": "AAAAAAFzsBJj9HUJza4="
-													},
-													"model": {
-														"$ref": "AAAAAAFzxEY2HwW3rBY="
-													},
-													"font": "Arial;13;0",
-													"left": 405,
-													"top": 251,
-													"width": 338,
-													"height": 13,
-													"text": "do/[sync_detected]: signature.reset()",
 													"horizontalAlignment": 0
 												},
 												{
@@ -426,10 +392,10 @@
 													},
 													"font": "Arial;13;0",
 													"left": 405,
-													"top": 266,
-													"width": 338,
+													"top": 236,
+													"width": 339,
 													"height": 13,
-													"text": "do/[sync_detected]: ppmsum[*].reset()",
+													"text": "do/[sync_detected]: ppmsum.reset_all_buffers()",
 													"horizontalAlignment": 0
 												},
 												{
@@ -443,18 +409,18 @@
 													},
 													"font": "Arial;13;0",
 													"left": 405,
-													"top": 281,
-													"width": 338,
+													"top": 251,
+													"width": 339,
 													"height": 13,
-													"text": "do/[sync_detected]: PPSum::set_pulse_level(signal_level)",
+													"text": "do/[sync_detected]: ppmsum.set_pulse_level(signal_level)",
 													"horizontalAlignment": 0
 												}
 											],
 											"font": "Arial;13;0",
 											"left": 400,
 											"top": 201,
-											"width": 348,
-											"height": 98
+											"width": 349,
+											"height": 68
 										},
 										{
 											"_type": "UMLInternalTransitionCompartmentView",
@@ -483,16 +449,16 @@
 											},
 											"font": "Arial;13;0",
 											"left": 400,
-											"top": 299,
-											"width": 348
+											"top": 269,
+											"width": 349
 										}
 									],
 									"font": "Arial;13;0",
 									"containerChangeable": true,
 									"left": 400,
 									"top": 176,
-									"width": 348,
-									"height": 123,
+									"width": 349,
+									"height": 93,
 									"nameCompartment": {
 										"$ref": "AAAAAAFzsBJj9HUE9+k="
 									},
@@ -2424,7 +2390,7 @@
 											},
 											"visible": false,
 											"font": "Arial;13;0",
-											"left": 1064,
+											"left": 1063,
 											"top": 240,
 											"height": 13,
 											"alpha": 1.5707963267948966,
@@ -2445,7 +2411,7 @@
 											},
 											"visible": null,
 											"font": "Arial;13;0",
-											"left": 1064,
+											"left": 1063,
 											"top": 255,
 											"height": 13,
 											"alpha": 1.5707963267948966,
@@ -2466,7 +2432,7 @@
 											},
 											"visible": false,
 											"font": "Arial;13;0",
-											"left": 1063,
+											"left": 1064,
 											"top": 211,
 											"height": 13,
 											"alpha": -1.5707963267948966,
@@ -2485,7 +2451,7 @@
 										"$ref": "AAAAAAFzsCo5snbdhD0="
 									},
 									"lineStyle": 3,
-									"points": "770:619;1064:232;748:235",
+									"points": "770:619;1064:232;749:226",
 									"showVisibility": true,
 									"nameLabel": {
 										"$ref": "AAAAAAFzsCwIhHctddU="
@@ -2786,10 +2752,10 @@
 									},
 									"font": "Source Code Pro;13;0",
 									"left": 920,
-									"top": 384,
+									"top": 376,
 									"width": 777,
 									"height": 177,
-									"text": "common oprations to all states:\n\nstatic Signature signature(MY_RX_ID); \nstatic PPMSum ppmsum[2] = { signature, signature };\n \nsignal_level = PIN_LEVEL;\nsignal_width = current_capture_time = TIMER;\n[last_capture_time>current_capture_time]: signal_width += (MAX_TIMER_VALUE-last_capture_time);\n[last_capture_time<=current_capture_time]: signal_width -= last_capture_time;\nlast_capture_time=current_capture_time;\n \nsync_detected = ppmsum[frame_buffer].update(signal_level, signal_width);"
+									"text": "common oprations to all states:\n\nstatic PPMSum ppmsum(MY_RX_ID);\n \nsignal_level = PIN_LEVEL;\nsignal_width = current_capture_time = TIMER;\n[last_capture_time>current_capture_time]: signal_width += (MAX_TIMER_VALUE-last_capture_time);\n[last_capture_time<=current_capture_time]: signal_width -= last_capture_time;\nlast_capture_time=current_capture_time;\n \nsync_detected = ppmsum.update(signal_level, signal_width);"
 								},
 								{
 									"_type": "UMLStateView",
@@ -2957,7 +2923,7 @@
 													"top": 411,
 													"width": 456.5302734375,
 													"height": 13,
-													"text": "do/[sync_detected && valid_sync_frame]: ppmsum[frame_buffer].reset()",
+													"text": "do/[sync_detected && valid_sync_frame]: ppmsum.reset_current_buffer()",
 													"horizontalAlignment": 0
 												}
 											],
@@ -3038,7 +3004,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 440,
-											"top": 309,
+											"top": 294,
 											"width": 97,
 											"height": 13,
 											"alpha": -1.588651908455542,
@@ -3061,7 +3027,7 @@
 											"visible": null,
 											"font": "Arial;13;0",
 											"left": 573,
-											"top": 310,
+											"top": 295,
 											"height": 13,
 											"alpha": 1.5707963267948966,
 											"distance": 30,
@@ -3082,7 +3048,7 @@
 											"visible": false,
 											"font": "Arial;13;0",
 											"left": 529,
-											"top": 311,
+											"top": 296,
 											"height": 13,
 											"alpha": -1.5707963267948966,
 											"distance": 15,
@@ -3099,7 +3065,7 @@
 									"tail": {
 										"$ref": "AAAAAAFzsBJj9HUDe9A="
 									},
-									"points": "544:298;544:336",
+									"points": "544:268;544:336",
 									"showVisibility": true,
 									"nameLabel": {
 										"$ref": "AAAAAAFztLT1DZJ5O3Y="
@@ -3132,7 +3098,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 616,
-											"top": 311,
+											"top": 296,
 											"width": 229,
 											"height": 13,
 											"alpha": -1.5789923083174364,
@@ -3155,7 +3121,7 @@
 											"visible": null,
 											"font": "Arial;13;0",
 											"left": 578,
-											"top": 310,
+											"top": 295,
 											"height": 13,
 											"alpha": 1.5707963267948966,
 											"distance": 30,
@@ -3176,7 +3142,7 @@
 											"visible": false,
 											"font": "Arial;13;0",
 											"left": 622,
-											"top": 311,
+											"top": 296,
 											"height": 13,
 											"alpha": -1.5707963267948966,
 											"distance": 15,
@@ -3193,7 +3159,7 @@
 									"tail": {
 										"$ref": "AAAAAAFztKsbo5Ihdss="
 									},
-									"points": "608:336;608:298",
+									"points": "608:336;608:268",
 									"showVisibility": true,
 									"nameLabel": {
 										"$ref": "AAAAAAFztQCmSJM5MKs="
@@ -3295,7 +3261,7 @@
 											"_parent": {
 												"$ref": "AAAAAAFzsBJj9HUCItw="
 											},
-											"name": "PPMSum::reset_pulse_level()"
+											"name": "ppmsum.reset_pulse_level()"
 										},
 										{
 											"_type": "UMLActivity",
@@ -3304,32 +3270,16 @@
 												"$ref": "AAAAAAFzsBJj9HUCItw="
 											},
 											"name": "sync_cycles=0"
-										},
-										{
-											"_type": "UMLActivity",
-											"_id": "AAAAAAFztNjTZ5L6q3E=",
-											"_parent": {
-												"$ref": "AAAAAAFzsBJj9HUCItw="
-											},
-											"name": "frame_buffer=0"
 										}
 									],
 									"doActivities": [
-										{
-											"_type": "UMLActivity",
-											"_id": "AAAAAAFzxEY2HwW3rBY=",
-											"_parent": {
-												"$ref": "AAAAAAFzsBJj9HUCItw="
-											},
-											"name": "[sync_detected]: signature.reset()"
-										},
 										{
 											"_type": "UMLActivity",
 											"_id": "AAAAAAFzsN2yMHjJIy8=",
 											"_parent": {
 												"$ref": "AAAAAAFzsBJj9HUCItw="
 											},
-											"name": "[sync_detected]: ppmsum[*].reset()"
+											"name": "[sync_detected]: ppmsum.reset_all_buffers()"
 										},
 										{
 											"_type": "UMLActivity",
@@ -3337,7 +3287,7 @@
 											"_parent": {
 												"$ref": "AAAAAAFzsBJj9HUCItw="
 											},
-											"name": "[sync_detected]: PPSum::set_pulse_level(signal_level)"
+											"name": "[sync_detected]: ppmsum.set_pulse_level(signal_level)"
 										}
 									]
 								},
@@ -3427,7 +3377,7 @@
 											"_parent": {
 												"$ref": "AAAAAAFztKsbo5Igh+4="
 											},
-											"name": "[sync_detected && valid_sync_frame]: ppmsum[frame_buffer].reset()"
+											"name": "[sync_detected && valid_sync_frame]: ppmsum.reset_current_buffer()"
 										}
 									]
 								}
