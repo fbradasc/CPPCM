@@ -1,29 +1,86 @@
-CPPCM-DSR - Library for Arduino
+TaggedPPMSum - Library for Arduino
 =============================================================================
-**(Combined Pulse Position Coded Modulation - Dgital Signature Recongnition)**
+**(Combined Tagged Pulse Position Modulation)**
 
 **-- PLEASE DO NOT USE - WORK IN PROGRESS - PLEASE DO NOT USE --**
 
-This library provides a simple interface to read and validate CPPM frames of
+This library provides a simple interface to read and validate PPMSum frames of
 up to 16 channels (up to 17 pulses), followed by a sync gap.
+
+    // Define here your own 4 bits receiver ID or read it from flash memory
+    //
+    #define RX_ID  0 // [0..15]
+
+    // Instantiate the PPMsum ecoder
+    //
+    TPPMSum tppmsum(RX_ID);
+
+    // Allocate the output buffers
+    //
+    TPPMSum::BasicChannels basic_channels;
+    TPPMSum::ExtraChannels extra_channels;
+    TPPMSum::OnOffChannels onoff_channels;
 
     void setup(void)
     {
-        CPPCM.begin();
+        // Initialize the output buffers and start the decoder
+        //
+        tppmsum.init(basic_channels,
+                     extra_channels,
+                     onoff_channels,
+                     512           ,  // default servo value [0..1023]
+                     0             ); // default onoff value [0,1]
     }
 
     void loop(void)
     {
-        int16_t channels[CPPCM_MAX_CHANNELS];
-
-        if (CPPCM.ok())
+        if (tppmsum.capturing() /* && !tppmsum.initializing() */)
         {
-            CPPCM.read(channels);
+            uint8_t sub_module = tppmsum.read(basic_channels,
+                                              extra_channels,
+                                              onoff_channels);
 
-            for (uint8_t c = 0; c < CPPCM.channels(); c++)
+            for (uint8_t c = 0; c < tppmsum.channels(); ++c)
             {
-                // do something fun with the channels[c] values,
-                // like fly a quadcopter...
+                if (c < BASIC_CHANNELS_COUNT)
+                {
+                    // Use the basic_channels[c] value to:
+                    //
+                    // - drive the c-th control/servo
+                    //
+                }
+
+                if (c < tppmsum.extra_channels())
+                {
+                    // Use the extra_channels[c] value to:
+                    //
+                    if (tppmsum.entangled())
+                    {
+                        // - drive the c-th control/servo of the sub_module-th sub module
+                        //
+                    }
+                    else
+                    {
+                        // - drive the ( c + BASIC_CHANNELS_COUNT )-th control/servo
+                        //
+                    }
+                }
+
+                if (c < tppmsum.onoff_channels())
+                {
+                    // Use the onoff_channels's c-th bit value to:
+                    //
+                    // - switch ON/OFF the c-th function of the sub_module-th sub module
+                    //
+                    if (TPPMSum::is_on(onoff_channels, c))
+                    {
+                        // switch ON
+                    }
+                    else
+                    {
+                        // switch OFF
+                    }
+                }
             }
         }
     }

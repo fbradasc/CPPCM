@@ -9,15 +9,34 @@
 //
 #define MAX_TICKS  65535
 
-#define RX_ID      0
-
-PPMSum ppmsum(RX_ID);
-
 /**
+ * Initialize the user provided output buffers
+ *
+ * ...and...
+ *
  * Enable the input capture interrupt.
  */
-void PPMSum::start(void)
+void TPPMSum::start(BasicChannels basic_channels,
+                    ExtraChannels extra_channels,
+                    OnOffChannels onoff_channels,
+                    uint16_t      default_servo_value,
+                    bool          default_onoff_value)
 {
+    for (uint8_t c=0; c<BASIC_CHANNELS_COUNT; ++c)
+    {
+        basic_channels[c] = default_servo_value;
+    }
+
+    for (uint8_t c=0; c<EXTRA_CHANNELS_COUNT; ++c)
+    {
+        extra_channels[c] = default_servo_value;
+    }
+
+    for (uint8_t c=0; c<ONOFF_CHANNELS_BYTES; ++c)
+    {
+        onoff_channels[c] = default_onoff_value;
+    }
+
     // Define inputs: (interrupt pins)
     //
     pinMode(ICP1, INPUT); // Input capture, pin D8
@@ -75,7 +94,7 @@ void PPMSum::start(void)
 /**
  * Disable the input capture interrupt.
  */
-void PPMSum::stop(void)
+void TPPMSum::stop(void)
 {
     bitClear(TIMSK1, ICIE1);
 }
@@ -83,7 +102,7 @@ void PPMSum::stop(void)
 /**
  * Atomically read the current CPPCM channel values into the array pointed to by `values`.
  */
-void PPSum::read(int16_t *values)
+void TPPMSum::read(int16_t *values)
 {
     noInterrupts();
 

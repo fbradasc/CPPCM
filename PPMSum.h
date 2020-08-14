@@ -2,19 +2,20 @@
 #define __PPMSUM_H__
 
 #include "CPPCM.h"
+#include "TaggedPPMSum.h"
 #include "PPMTag.h"
 
 ISR(TIMER1_CAPT_vect);
 
-class PPMSum
+class TPPMSum
 {
 public:
-    PPMSum(const PPMSum& ref)
+    TPPMSum(const PPMSum& ref)
     {
         *this = ref;
     }
 
-    PPMSum(uint8_t rx_id)
+    TPPMSum(uint8_t rx_id)
         : _state(INIT_DECODE)
         , _tag  (rx_id)
     {
@@ -35,13 +36,62 @@ public:
         _dsr[SIGNATURE_CUR_DATA][HI_LEVEL].reset();
     }
 
-    void    start     (void);
-    void    stop      (void);
-    void    read      (int16_t *values);
+    typedef uint16_t[BASIC_CHANNELS_COUNT] BasicChannels;
+    typedef uint16_t[EXTRA_CHANNELS_COUNT] ExtraChannels;
+    typedef uint8_t [ONOFF_CHANNELS_BYTES] OnOffChannels;
 
-    inline bool    ok          (void) { return _state > SYNC_SEARCH; }
-    inline bool    initializing(void) { return _state < PPM_CAPTURE; }
-    inline uint8_t channels    (void) { return _dsr[_flags.frame_buffer].captures; }
+    // Initialize the user provided channels arrays and start the PPM capture engine
+    //
+    void    init(BasicChannels basic_channels     ,
+                 ExtraChannels extra_channels     ,
+                 OnOffChannels onoff_channels     ,
+                 uint16_t      default_servo_value,
+                 bool          default_onoff_value);
+
+    void    stop(void);
+
+    // returns the current submodule ID
+    //
+    uint8_t read(BasicChannels basic_channels,
+                 ExtraChannels extra_channels,
+                 OnOffChannels onoff_channels);
+
+    inline bool capturing(void)
+    {
+        return _state > SYNC_SEARCH;
+    }
+
+    inline bool initializing(void)
+    {
+        return _state < PPM_CAPTURE;
+    }
+
+    inline uint8_t channels(void)
+    {
+        return max(BASIC_CHANNELS_COUNT,
+                   max(extra_channels(),
+                       onoff_channels()));
+    }
+
+    inline uint8_t extra_channels(void)
+    {
+        if (_flags.entangled)
+        {
+            return EXTRA_CHANNELS_COUNT;
+        }
+
+        return _dsr[_flags.frame_buffer].captures - BASIC_CHANNELS_COUNT;
+    }
+
+    inline uint8_t onoff_channels(void)
+    {
+        if (_flags.entangled)
+        {
+            return ONOFF_CHANNELS_COUNT;
+        }
+
+        return 0;
+    }
 
     //------------------------------------//
     //                                    //
