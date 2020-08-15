@@ -1,7 +1,7 @@
-#if !defined(__SIGNATURE_H__)
-#define __SIGNATURE_H__
+#if !defined(__TPPM_TAG_H__)
+#define __TPPM_TAG_H__
 
-#include "CPPCM.h"
+#include "TPPMCfg.h"
 
 #define MAX_SUPERINPOSED_CHANNELS 11
 
@@ -20,11 +20,21 @@
 
 #define BIT_VAL(word,bit_pos)     (((word) >> (bit_pos)) & 0x01)
 
-class PPMTag
+#define ONOFF_THRESHOLD_STEP      ( ( MAX_CHANNEL_WIDTH - MIN_CHANNEL_WIDTH ) / 4 )
+
+#define ONOFF_THRESHOLD_00        ( MIN_CHANNEL_WIDTH  + ONOFF_THRESHOLD_STEP )
+#define ONOFF_THRESHOLD_01        ( ONOFF_THRESHOLD_00 + ONOFF_THRESHOLD_STEP )
+#define ONOFF_THRESHOLD_10        ( ONOFF_THRESHOLD_01 + ONOFF_THRESHOLD_STEP )
+
+#define MUXED_CHANNLES            3
+#define FIRST_EXTRA_CHANNEL       4
+#define FIRST_ONOFF_CHANNEL       7
+
+class TPPMTag
 {
 public:
-    PPMTag(const uint8_t &rx_id)
-        : _rx_id        (rx_id)
+    TPPMTag()
+        : _rx_id        (0)
         , _raw_bits     (0)
         , _paired_tx_id (0)  // until paired all transmitters are valid
         , _valid        (false)
@@ -37,6 +47,11 @@ public:
         _paired_tx_id = 0;
         _valid        = false;
         _encoded      = false;
+    }
+
+    inline void set_rx_id(const uint8_t &rx_id)
+    {
+        _rx_id = rx_id & 0x07;
     }
 
     inline void update(const uint8_t &captures, const uint16_t &pulse_width)
@@ -110,7 +125,7 @@ public:
                 // _raw_bits        : 0000000000000000000000
                 // _tx_id           : 00000000 (expected even parity: 0)
                 // _rx_id+_rx_sub_id: 00000000 (expected odd  parity: 1)
-                // _scan            : 0000     (expected odd  parity: 1)
+                // _scan_index      : 0000     (expected odd  parity: 1)
                 // tx_id_even_parity: 0 ->     parity match
                 // rx_id_odd_parity : 0 -> (E) parity does not match
                 // scan_odd_parity  : 0 -> (E) parity does not match
@@ -118,7 +133,7 @@ public:
                 // _raw_bits        : 0101010101010101010101
                 // _tx_id           : 00000000 (expected even parity: 0)
                 // _rx_id+_rx_sub_id: 11111111 (expected odd  parity: 1)
-                // _scan            : 000      (expected odd  parity: 1)
+                // _scan_index      : 000      (expected odd  parity: 1)
                 // tx_id_even_parity: 1 -> (E) parity does not match
                 // rx_id_odd_parity : 1 ->     parity match
                 // scan_odd_parity  : 1 ->     parity match
@@ -126,7 +141,7 @@ public:
                 // _raw_bits        : 1010101010101010101010
                 // _tx_id           : 11111111 (expected even parity: 0)
                 // _rx_id+_rx_sub_id: 00000000 (expected odd  parity: 1)
-                // _scan            : 111      (expected odd  parity: 0)
+                // _scan_index      : 111      (expected odd  parity: 0)
                 // tx_id_even_parity: 0 ->     parity match
                 // rx_id_odd_parity : 0 -> (E) parity does not match
                 // scan_odd_parity  : 0 ->     parity match
@@ -134,7 +149,7 @@ public:
                 // _raw_bits        : 1111111111111111111111
                 // _tx_id           : 11111111 (expected even parity: 0)
                 // _rx_id+_rx_sub_id: 11111111 (expected odd  parity: 1)
-                // _scan            : 111      (expected odd  parity: 0)
+                // _scan_index      : 111      (expected odd  parity: 0)
                 // tx_id_even_parity: 1 -> (E) parity does not match
                 // rx_id_odd_parity : 1 ->     parity match
                 // scan_odd_parity  : 1 -> (E) parity does not match
@@ -202,9 +217,9 @@ public:
                                  (BIT_VAL(_raw_bits, RX_SUB_ID_BIT_2) << 2) |
                                  (BIT_VAL(_raw_bits, RX_SUB_ID_BIT_3) << 3) ;
 
-                    _scan = (BIT_VAL(_raw_bits, SCAN_BIT_0) << 0) |
-                            (BIT_VAL(_raw_bits, SCAN_BIT_2) << 1) |
-                            (BIT_VAL(_raw_bits, SCAN_BIT_3) << 2) ;
+                    _scan_index = (BIT_VAL(_raw_bits, SCAN_BIT_0) << 0) |
+                                  (BIT_VAL(_raw_bits, SCAN_BIT_2) << 1) |
+                                  (BIT_VAL(_raw_bits, SCAN_BIT_3) << 2) ;
                 }
             }
 
@@ -217,6 +232,102 @@ public:
             _raw_bits = 0;
             _valid    = false;
             _encoded  = false;
+        }
+    }
+
+    inline void decode(TPPM::BasicChannels raw_channels_in,
+                       TPPM::ExtraChannels extra_channels_out,
+                       TPPM::OnOffChannels onoff_channels_out)
+    {
+        if ((NULL == raw_channels_in)
+            ||
+            ((NULL == extra_channels_out)
+             &&
+             (NULL == onoff_channels_out)))
+        {
+            return;
+        }
+
+        for (uint8_t c=0; c<MUXED_CHANNLES; ++c)
+        {
+            if (NULL != extra_channels_out)
+            {
+                // Extra channels addressed by the superimposed tag's scan index:
+                //
+                // +----+----------------++----------------------------------------+
+                // |    |                ||                scan index              |
+                // | CH | Function       ||  0  |  1 |  2 |  3 |  4 |  5 |  6 |  7 |
+                // +----+----------------++-----+----+----+----+----+----+----+----+
+                // |  4 | extra channels ||  0  |  1 |  2 |  3 |  0 |  1 |  2 |  3 |
+                // |  5 | extra channels ||  4  |  5 |  6 |  7 |  4 |  5 |  6 |  7 |
+                // |  6 | extra channels ||  8  |  9 | 10 | 11 |  8 |  9 | 10 | 11 |
+                // +----+----------------++-----+----+----+----+----+----+----+----+
+                //
+                extra_channels_out[(_scan_index & 3) | (c << 2)] = raw_channels_in[c+FIRST_EXTRA_CHANNEL];
+            }
+
+            if (NULL != onoff_channels_out)
+            {
+                // On/Off channels addressed by the superimposed tag's scan index:
+                //
+                // +----+-----------------++-------------------------------------------------------------------------------+
+                // |    |                 ||                                   scan index                                  |
+                // | CH | Function        ||    0    |    1    |    2    |    3    |    4    |    5    |    6    |    7    |
+                // +----+-----------------++---------+---------+---------+---------+---------+---------+---------+---------+
+                // |  7 | on/off channels ||  0 /  1 |  2 /  3 |  4 /  5 |  6 /  7 |  8 /  9 | 10 / 11 | 12 / 13 | 14 / 15 |
+                // |  8 | on/off channels || 16 / 17 | 18 / 19 | 20 / 21 | 22 / 23 | 24 / 25 | 26 / 27 | 28 / 28 | 30 / 31 |
+                // |  9 | on/off channels || 32 / 33 | 34 / 35 | 36 / 37 | 38 / 39 | 40 / 41 | 42 / 43 | 44 / 45 | 46 / 47 |
+                // +----+-----------------++---------+---------+---------+---------+---------+---------+---------+---------+
+                //
+                uint8_t &channel_val = raw_channels_in[c+FIRST_ONOFF_CHANNEL];
+
+                // On/Off channels bits addressed by the superimposed tag's scan index:
+                //
+                // +----+----------------------++---------------------------------------------------------------+
+                // |    |                      ||                           scan index                          |
+                // | CH | Function             ||   0   |   1   |   2   |   3   |   4   |   5   |   6   |   7   |
+                // +----+----------------------++-------+-------+-------+-------+-------+-------+-------+-------+
+                // |  7 | on/off channels bits || 0 / 1 | 2 / 3 | 4 / 5 | 6 / 7 | 0 / 1 | 2 / 3 | 4 / 5 | 6 / 7 |
+                // |  8 | on/off channels bits || 0 / 1 | 2 / 3 | 4 / 5 | 6 / 7 | 0 / 1 | 2 / 3 | 4 / 5 | 6 / 7 |
+                // |  9 | on/off channels bits || 0 / 1 | 2 / 3 | 4 / 5 | 6 / 7 | 0 / 1 | 2 / 3 | 4 / 5 | 6 / 7 |
+                // +----+----------------------++-------+-------+-------+-------+-------+-------+-------+-------+
+                //
+                uint8_t bit_index = ((_scan_index & 3) << 1);
+
+                // On/Off channels bytes addressed by the superimposed tag's scan index:
+                //
+                // +----+-----------------------++-------------------------------+
+                // |    |                       ||           scan index          |
+                // | CH | Function              || 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+                // +----+-----------------------++---+---+---+---+---+---+---+---+
+                // |  7 | on/off channels bytes || 0 | 0 | 0 | 0 | 1 | 1 | 1 | 1 |
+                // |  8 | on/off channels bytes || 2 | 2 | 2 | 2 | 3 | 3 | 3 | 3 |
+                // |  9 | on/off channels bytes || 4 | 4 | 4 | 4 | 5 | 5 | 5 | 5 |
+                // +----+-----------------------++---+---+---+---+---+---+---+---+
+                //
+                uint8_t byte_index = (c << 2) + ((_scan_index & 4) >> 3);
+
+                // clear the bits
+                //
+                onoff_channels_out[byte_index] &= ~(0x11 << bit_index);
+
+                // set the bits
+                //
+                if (channel_val >= ONOFF_THRESHOLD_10)
+                {
+                    onoff_channels_out[byte_index] |= (0x11 << bit_index);
+                }
+                else
+                if (channel_val >= ONOFF_THRESHOLD_01)
+                {
+                    onoff_channels_out[byte_index] |= (0x10 << bit_index);
+                }
+                else
+                if (channel_val >= ONOFF_THRESHOLD_00)
+                {
+                    onoff_channels_out[byte_index] |= (0x01 << bit_index);
+                }
+            }
         }
     }
 
@@ -248,9 +359,9 @@ public:
         return _rx_sub_id;
     }
 
-    inline uint8_t scan()
+    inline uint8_t scan_index()
     {
-        return _scan;
+        return _scan_index;
     }
 
 private:
@@ -259,7 +370,7 @@ private:
     uint8_t  _paired_tx_id;
     uint8_t  _tx_id;
     uint8_t  _rx_sub_id;
-    uint8_t  _scan;
+    uint8_t  _scan_index;
     bool     _valid;
     bool     _encoded;
 
@@ -290,4 +401,4 @@ private:
     };
 };
 
-#endif // __SIGNATURE_H__
+#endif // __TPPM_TAG_H__

@@ -1,4 +1,4 @@
-TaggedPPMSum - Library for Arduino
+TPPMSum - Library for Arduino
 =============================================================================
 **(Combined Tagged Pulse Position Modulation)**
 
@@ -7,25 +7,29 @@ TaggedPPMSum - Library for Arduino
 This library provides a simple interface to read and validate PPMSum frames of
 up to 16 channels (up to 17 pulses), followed by a sync gap.
 
-    // Define here your own 4 bits receiver ID or read it from flash memory
-    //
-    #define RX_ID  0 // [0..15]
+    #include "TPPMSum.h"
 
-    // Instantiate the PPMsum ecoder
+    // Instantiate the TPPMsum decoder
     //
-    TPPMSum tppmsum(RX_ID);
+    TPPMSum tppmsum;
 
     // Allocate the output buffers
     //
-    TPPMSum::BasicChannels basic_channels;
-    TPPMSum::ExtraChannels extra_channels;
-    TPPMSum::OnOffChannels onoff_channels;
+    TPPM::BasicChannels basic_channels;
+    TPPM::ExtraChannels extra_channels;
+    TPPM::OnOffChannels onoff_channels;
 
     void setup(void)
     {
+        // Define here your own 4 bits receiver ID
+        // or read it from the flash memory
+        //
+        const uint8_t rx_id = 0; // [0..15]
+
         // Initialize the output buffers and start the decoder
         //
-        tppmsum.init(basic_channels,
+        tppmsum.init(rx_id,
+                     basic_channels,
                      extra_channels,
                      onoff_channels,
                      512           ,  // default servo value [0..1023]
@@ -40,9 +44,9 @@ up to 16 channels (up to 17 pulses), followed by a sync gap.
                                               extra_channels,
                                               onoff_channels);
 
-            for (uint8_t c = 0; c < tppmsum.channels(); ++c)
+            for (uint8_t c = 0; c < tppmsum.total_channels_count(); ++c)
             {
-                if (c < BASIC_CHANNELS_COUNT)
+                if (c < tppmsum.basic_channels_count())
                 {
                     // Use the basic_channels[c] value to:
                     //
@@ -50,7 +54,7 @@ up to 16 channels (up to 17 pulses), followed by a sync gap.
                     //
                 }
 
-                if (c < tppmsum.extra_channels())
+                if (c < tppmsum.extra_channels_count())
                 {
                     // Use the extra_channels[c] value to:
                     //
@@ -61,12 +65,12 @@ up to 16 channels (up to 17 pulses), followed by a sync gap.
                     }
                     else
                     {
-                        // - drive the ( c + BASIC_CHANNELS_COUNT )-th control/servo
+                        // - drive the ( c + tppmsum.basic_channels_count() )-th control/servo
                         //
                     }
                 }
 
-                if (c < tppmsum.onoff_channels())
+                if (c < tppmsum.onoff_channels_count())
                 {
                     // Use the onoff_channels's c-th bit value to:
                     //
@@ -85,8 +89,8 @@ up to 16 channels (up to 17 pulses), followed by a sync gap.
         }
     }
 
-The term *Code* in the project name means the pulse widths can be used to
-superimpose to each frame a digital code of up to 2*(channels+1) bits.
+The term *Tagged* in the project name means the pulse widths can be used to
+superimpose to each frame a digital *tag* of up to 2*(channels+1) bits.
 
 The width of each pulse is 0.3 to 0.46 mS (300 to 460 uS) allowing to superimpose
 2 bits each pulse, as for the following table:
@@ -144,13 +148,8 @@ discarded as well.
 
 When a frame is discarded the last good frame is used instead.
 
-## GLITCH FILTER
-
-Each channel is averaged with the value from the previous frame, reducing
-servo jitter on weak signals.
-
 ## FAIL SAFE
 
 On receiving a sufficient number of good frames we save it for fail safe. 
-Then, if the signal is corrupted for too long, we output the fail safe frame
-instead of the last good frame.  
+Then, if the signal is corrupted for too long (more than 25 frames), we output
+the fail safe frame instead of the last good frame.  

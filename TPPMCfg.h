@@ -1,5 +1,5 @@
-#if !defined(__CPPM_CONFIG_H__)
-#define __CPPM_CONFIG_H__
+#if !defined(__TPPM_CFG_H__)
+#define __TPPM_CFG_H__
 
 #include <inttypes.h>
 
@@ -18,8 +18,6 @@
 #define MIN_SYNC_WIDTH_US      2500
 
 #define MIN_PULSE_WIDTH_US     300
-
-#define MAX_TIMER_VALUE        0xffff
 
 #define USEC_TO_WIDTH(us)      (us) // TODO
 
@@ -52,4 +50,11 @@
 
 #define IS_IN_RANGE(cval,vmin,vmax) (((cval)>=(vmin)) && ((cval)<=(vmax)))
 
-#endif // __CPPM_CONFIG_H__
+namespace TPPM
+{
+    typedef uint16_t[BASIC_CHANNELS_COUNT] BasicChannels;
+    typedef uint16_t[EXTRA_CHANNELS_COUNT] ExtraChannels;
+    typedef uint8_t [ONOFF_CHANNELS_BYTES] OnOffChannels;
+};
+
+#endif // __TPPM_CFG_H__

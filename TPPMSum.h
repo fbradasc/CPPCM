@@ -1,15 +1,19 @@
-#if !defined(__PPMSUM_H__)
-#define __PPMSUM_H__
+#if !defined(__TPPM_SUM_H__)
+#define __TPPM_SUM_H__
 
-#include "CPPCM.h"
-#include "TaggedPPMSum.h"
-#include "PPMTag.h"
+#include "TPPMTag.h"
 
-#define SWITCH_THRESHOLD_STEP  ( ( MAX_CHANNEL_WIDTH - MIN_CHANNEL_WIDTH ) / 4 )
+// Number of consecutive good frames required at startup.
+//
+#define GOOD_FRAMES_COUNT 10
 
-#define SWITCH_THRESHOLD_00    ( MIN_CHANNEL_WIDTH   + SWITCH_THRESHOLD_STEP )
-#define SWITCH_THRESHOLD_01    ( SWITCH_THRESHOLD_00 + SWITCH_THRESHOLD_STEP )
-#define SWITCH_THRESHOLD_10    ( SWITCH_THRESHOLD_01 + SWITCH_THRESHOLD_STEP )
+// Number of consecutive bad frames accepted without going to failsafe.
+//
+#define HOLD_FRAMES_COUNT 25
+
+// Number of consecutive bad frames accepted without re-init the encoder.
+//
+#define INIT_FRAMES_COUNT 50
 
 ISR(TIMER1_CAPT_vect);
 
@@ -21,10 +25,10 @@ public:
         *this = ref;
     }
 
-    TPPMSum(uint8_t rx_id)
+    TPPMSum()
         : _state(INIT_DECODE)
-        , _tag  (rx_id)
     {
+        _flags.fail_safe_mode   = 0;
         _flags.signature_buffer = 0;
         _flags.frame_buffer     = ALT1_DATA_BUFFER;
         _flags.pulse_level_set  = 0;
@@ -42,54 +46,81 @@ public:
         _dsr[SIGNATURE_CUR_DATA][HI_LEVEL].reset();
     }
 
-    typedef uint16_t[BASIC_CHANNELS_COUNT] BasicChannels;
-    typedef uint16_t[EXTRA_CHANNELS_COUNT] ExtraChannels;
-    typedef uint8_t [ONOFF_CHANNELS_BYTES] OnOffChannels;
-
-    // Initialize the user provided channels arrays and start the PPM capture engine
+    // Initialize the user provided channels arrays and start the PPMSum decoder
     //
-    void init(BasicChannels basic_channels     ,
-              ExtraChannels extra_channels     ,
-              OnOffChannels onoff_channels     ,
-              uint16_t      default_servo_value,
-              bool          default_onoff_value);
+    void init(TPPM::BasicChannels basic_channels     ,
+              TPPM::ExtraChannels extra_channels     ,
+              TPPM::OnOffChannels onoff_channels     ,
+              uint16_t            default_servo_value,
+              bool                default_onoff_value);
 
+    // Stop the PPMSum decoder
+    //
     void stop(void);
 
-    // returns the current submodule ID
+    // Retrieve the decoded channels data and returns the current controlled sub-module
     //
-    uint8_t read(BasicChannels basic_channels,
-                 ExtraChannels extra_channels,
-                 OnOffChannels onoff_channels);
+    uint8_t read(TPPM::BasicChannels basic_channels,
+                 TPPM::ExtraChannels extra_channels,
+                 TPPM::OnOffChannels onoff_channels);
 
+    // Returns true if the decoder is capturing whole frames, either usable or not
+    //
     inline bool capturing(void)
     {
         return _state > SYNC_SEARCH;
     }
 
+    // Returns true if the decoder is NOT yet capturing usable frames
+    //
     inline bool initializing(void)
     {
         return _state < PPM_CAPTURE;
     }
 
-    inline uint8_t channels(void)
+    inline uint8_t total_channels_count(void)
     {
         return max(BASIC_CHANNELS_COUNT,
                    max(extra_channels(),
                        onoff_channels()));
     }
 
-    inline uint8_t extra_channels(void)
+    // Returns the number of basic channels
+    //
+    // Currently the basic channels are the first 4 in the frame
+    //
+    inline uint8_t basic_channels_count(void)
+    {
+        return BASIC_CHANNELS_COUNT;
+    }
+
+    // If the frame does not have a digital tag, it returns:
+    //
+    // - the number of raw channels captured in the frame except the basic ones
+    //
+    // If the frame has a digital tag, it returns:
+    //
+    // - the number of the supported multiplexed channels which are encoded
+    //   in the 3 channels which, in the frame, follow the basic ones
+    //
+    inline uint8_t extra_channels_count(void)
     {
         if (_flags.entangled)
         {
             return EXTRA_CHANNELS_COUNT;
         }
 
-        return _dsr[_flags.frame_buffer].captures - BASIC_CHANNELS_COUNT;
+        return _dsr[_flags.signature_buffer].captures - BASIC_CHANNELS_COUNT;
     }
 
-    inline uint8_t onoff_channels(void)
+    // If the frame does not have a digital tag, it returns 0
+    //
+    // If the frame has a digital tag, it returns:
+    //
+    // - the number of the supported ON/OFF switches which are encoded
+    //   in the last 3 channels in the frame
+    //
+    inline uint8_t onoff_channels_count(void)
     {
         if (_flags.entangled)
         {
@@ -101,25 +132,13 @@ public:
 
     //------------------------------------//
     //                                    //
-    // Superinposed Coding data accessors //
+    // Superimposed Coding data accessors //
     //                                    //
     //------------------------------------//
 
-    // returns true if the trasmitter transmits superinposed code
+    // returns true if the transmitter transmits superimposed tag
     //
-    inline bool    entangled (void) { return _flags.entangled; }
-
-    // returns the trasmitter ID in the superinposed code
-    //
-    inline uint8_t transmiter(void) { return _tag.tx_id(); }
-
-    // returns the scan field in the superinposed code
-    //
-    inline uint8_t scan_index(void) { return _tag.scan(); }
-
-    // returns the submodule ID field in the superinposed code
-    //
-    inline uint8_t sub_module(void) { return _tag.rx_sub_id(); }
+    inline bool entangled(void) { return _flags.entangled; }
 
 private:
     friend void TIMER1_CAPT_vect();
@@ -220,6 +239,7 @@ private:
         uint8_t frame_buffer    : 1;
         uint8_t signature_buffer: 1;
         uint8_t entangled       : 1;
+        uint8_t fail_safe_mode  : 1;
     }
     Flags;
 
@@ -228,16 +248,16 @@ private:
     uint16_t      _min_signal_width;
     uint16_t      _max_signal_width;
 
-    Signature     _dsr[SIGNATURE_BUFFERS][SIGNAL_LEVELS]; // pulses and gaps
+    Signature     _dsr[SIGNATURE_BUFFERS][SIGNAL_LEVELS];     // pulses and gaps
 
     uint16_t      _raw_channels[FRAME_BUFFERS][MAX_CHANNELS]; // 0: alt frame buffer
                                                               // 1: alt frame buffer
                                                               // 2: fail safe buffer
-    ExtraChannels _extra_channels;
-    OnOffChannels _onoff_channels;
-    PPMTag        _tag;
-    uint8_t       _good_frames;
-    uint8_t       _hold_frames;
+    TPPM::ExtraChannels _extra_channels;
+    TPPM::OnOffChannels _onoff_channels;
+    TPPMTag             _tag;
+    uint8_t             _good_frames;
+    uint8_t             _hold_frames;
 
     inline uint16_t process(uint8_t  signal_level,
                             uint16_t signal_width,
@@ -296,6 +316,7 @@ private:
 
         if (INIT_DECODE == _state)
         {
+            _flags.fail_safe_mode  = 1;
             _flags.pulse_level_set = 0;
             _flags.pulse_level     = HI_LEVEL;
             _min_signal_width      = MIN_GAP_WIDTH;
@@ -331,7 +352,7 @@ private:
         else
         if (ACKNOWLEDGE == _state)
         {
-            // Capture a number of consecutive matching frames in order to identify the transmiter
+            // Capture a number of consecutive matching frames in order to identify the transmitter
             //
             if (sync_detected)
             {
@@ -354,7 +375,7 @@ private:
                     (!_tag.is_encoded() || _tag.is_valid()))
                 {
                     // A good frame has been captured, we need to collect a few of them
-                    // in order to be sure we are entangled to the transmiter
+                    // in order to be sure we are entangled to the transmitter
                     //
                     ++_good_frames;
 
@@ -394,6 +415,8 @@ private:
                         //
                         _state = PPM_CAPTURE;
                     }
+
+                    _flags.fail_safe_mode = 0;
                 }
                 else
                 {
@@ -416,19 +439,16 @@ private:
                         &&
                         (_dsr[_flags.signature_buffer][!_flags.pulse_level].captures == (_dsr[_flags.signature_buffer][_flags.pulse_level].captures - 1)))
                     {
-                        if (_flags.entangled && !_tag.is_encoded())
+                        // It's a good frame
+                        //
+                        if (!_flags.entangled || (_tag.is_encoded() && _tag.is_valid()))
                         {
-                            // Bad frame - increase the bad frames counter
-                            //
-                            ++_hold_frames;
-                        }
-                        else
-                        if (!_flags.entangled || _tag.is_valid())
-                        {
-                            // Good frame - reset the bad frames counter
+                            // And it's for me - reset the hold frames counter
                             //
                             _hold_frames = 0;
 
+                            // Keep in sync the alternative frame buffer with the current one
+                            //
                             uint8_t old_frame_buffer =  _flags.frame_buffer;
                             uint8_t new_frame_buffer = !_flags.frame_buffer;
 
@@ -439,58 +459,74 @@ private:
 
                             if (_flags.entangled)
                             {
-                                for (uint8_t c=0; c<3; ++c)
-                                {
-                                    _extra_channels[(_tag.scan() & 3) | (c << 2)] = _raw_channels[old_frame_buffer][c+4];
-
-                                    uint8_t &channel_val = _raw_channels[old_frame_buffer][c+7];
-
-                                    uint8_t bit_index  = ((_tag.scan() & 3) << 1);
-                                    uint8_t byte_index = (c << 2) + ((_tag.scan() & 4) >> 3);
-
-                                    // clear the bits
-                                    //
-                                    _onoff_channels[byte_index] &= ~(0x11 << bit_index);
-
-                                    // set the bits
-                                    //
-                                    if (channel_val >= SWITCH_THRESHOLD_10)
-                                    {
-                                        _onoff_channels[byte_index] |= (0x11 << bit_index);
-                                    }
-                                    else
-                                    if (channel_val >= SWITCH_THRESHOLD_01)
-                                    {
-                                        _onoff_channels[byte_index] |= (0x10 << bit_index);
-                                    }
-                                    else
-                                    if (channel_val >= SWITCH_THRESHOLD_00)
-                                    {
-                                        _onoff_channels[byte_index] |= (0x01 << bit_index);
-                                    }
-                                }
+                                // I'm entangled
+                                //
+                                // Let's decode the extra channels according to the superimposed tag
+                                //
+                                _tag.decode(_raw_channels[new_frame_buffer],
+                                            _extra_channels,
+                                            _onoff_channels);
                             }
 
                             // Switch the active frame buffer
                             //
                             _flags.frame_buffer = new_frame_buffer;
+
+                            // Let's go out from fail safe mode and let's use the good frames
+                            //
+                            _flags.fail_safe_mode = 0;
                         }
-                        // Good frame but not for me, stay with the current frame buffer
-                        //
+                        else
+                        if (!_tag.is_encoded())
+                        {
+                            // I'm entangled but I received a good NOT tagged PPM frame
+                            //
+                            // Increase the hold frames counter
+                            //
+                            ++_hold_frames;
+                        }
+                        else
+                        {
+                            // I'm entangled and I received a good tagged PPM frame which it's not for me.
+                            //
+                            // Freeze with the last good frame, maybe the transmitter is controlling another receiver.
+                            //
+                            // Reset the hold frames counter
+                            //
+                            _hold_frames = 0;
+
+                            // Let's go out from fail safe mode and let's use the last good frame
+                            //
+                            _flags.fail_safe_mode = 0;
+                        }
                     }
                     else
                     {
-                        // Bad frame - increase the bad frames counter
+                        // It's a bad frame
+                        //
+                        // Increase the hold frames counter
                         //
                         ++_hold_frames;
                     }
-                }
 
-                if (!_flags.pulse_level_set || (HOLD_FRAMES_COUNT <= _hold_frames))
+                    if (HOLD_FRAMES_COUNT <= _hold_frames)
+                    {
+                        // The failures count to enter in fail safe mode has been reached
+                        //
+                        _flags.fail_safe_mode = _flags.fail_safe_set;
+
+                        // Avoid overflows due to too many increments
+                        //
+                        _hold_frames = HOLD_FRAMES_COUNT;
+                    }
+                }
+                else
                 {
-                    // No pulse_level detected or max failures count reached
+                    // Hmmm, a pulse level was not detected, anyway we entered in the PPM_CAPTURE mode...
                     //
-                    // Re-init the decoder
+                    // ...this should never happens...
+                    //
+                    // ...let's re-initialize the decoder
                     //
                     _state = INIT_DECODE;
                 }
@@ -501,4 +537,4 @@ private:
     }
 };
 
-#endif // __PPMSUM_H__
+#endif // __TPPM_SUM_H__
