@@ -5,6 +5,12 @@
 #include "TaggedPPMSum.h"
 #include "PPMTag.h"
 
+#define SWITCH_THRESHOLD_STEP  ( ( MAX_CHANNEL_WIDTH - MIN_CHANNEL_WIDTH ) / 4 )
+
+#define SWITCH_THRESHOLD_00    ( MIN_CHANNEL_WIDTH   + SWITCH_THRESHOLD_STEP )
+#define SWITCH_THRESHOLD_01    ( SWITCH_THRESHOLD_00 + SWITCH_THRESHOLD_STEP )
+#define SWITCH_THRESHOLD_10    ( SWITCH_THRESHOLD_01 + SWITCH_THRESHOLD_STEP )
+
 ISR(TIMER1_CAPT_vect);
 
 class TPPMSum
@@ -42,13 +48,13 @@ public:
 
     // Initialize the user provided channels arrays and start the PPM capture engine
     //
-    void    init(BasicChannels basic_channels     ,
-                 ExtraChannels extra_channels     ,
-                 OnOffChannels onoff_channels     ,
-                 uint16_t      default_servo_value,
-                 bool          default_onoff_value);
+    void init(BasicChannels basic_channels     ,
+              ExtraChannels extra_channels     ,
+              OnOffChannels onoff_channels     ,
+              uint16_t      default_servo_value,
+              bool          default_onoff_value);
 
-    void    stop(void);
+    void stop(void);
 
     // returns the current submodule ID
     //
@@ -217,19 +223,21 @@ private:
     }
     Flags;
 
-    Status    _state           ;
-    Flags     _flags           ;
-    uint16_t  _min_signal_width;
-    uint16_t  _max_signal_width;
+    Status        _state           ;
+    Flags         _flags           ;
+    uint16_t      _min_signal_width;
+    uint16_t      _max_signal_width;
 
-    Signature _dsr[SIGNATURE_BUFFERS][SIGNAL_LEVELS]; // pulses and gaps
+    Signature     _dsr[SIGNATURE_BUFFERS][SIGNAL_LEVELS]; // pulses and gaps
 
-    uint16_t  _channels[FRAME_BUFFERS][MAX_CHANNELS]; // 0: alt frame buffer
-                                                      // 1: alt frame buffer
-                                                      // 2: fail safe buffer
-    PPMTag    _tag;
-    uint8_t   _good_frames;
-    uint8_t   _hold_frames;
+    uint16_t      _raw_channels[FRAME_BUFFERS][MAX_CHANNELS]; // 0: alt frame buffer
+                                                              // 1: alt frame buffer
+                                                              // 2: fail safe buffer
+    ExtraChannels _extra_channels;
+    OnOffChannels _onoff_channels;
+    PPMTag        _tag;
+    uint8_t       _good_frames;
+    uint8_t       _hold_frames;
 
     inline uint16_t process(uint8_t  signal_level,
                             uint16_t signal_width,
@@ -253,7 +261,7 @@ private:
                     {
                         // Save the channel width in the current frame buffer
                         //
-                        _channels[_flags.frame_buffer][channel] = channel_width;
+                        _raw_channels[_flags.frame_buffer][channel] = channel_width;
                     }
                 }
             }
@@ -376,7 +384,7 @@ private:
                             //
                             for (uint8_t ch=0; ch < MAX_CHANNELS; ch++)
                             {
-                                _channels[FAIL_SAFE_BUFFER][ch] = _channels[_flags.frame_buffer][ch];
+                                _raw_channels[FAIL_SAFE_BUFFER][ch] = _raw_channels[_flags.frame_buffer][ch];
                             }
 
                             _flags.fail_safe_set = true;
@@ -426,7 +434,41 @@ private:
 
                             for (uint8_t ch=0; ch < MAX_CHANNELS; ch++)
                             {
-                                _channels[new_frame_buffer][ch] = _channels[old_frame_buffer][ch];
+                                _raw_channels[new_frame_buffer][ch] = _raw_channels[old_frame_buffer][ch];
+                            }
+
+                            if (_flags.entangled)
+                            {
+                                for (uint8_t c=0; c<3; ++c)
+                                {
+                                    _extra_channels[(_tag.scan() & 3) | (c << 2)] = _raw_channels[old_frame_buffer][c+4];
+
+                                    uint8_t &channel_val = _raw_channels[old_frame_buffer][c+7];
+
+                                    uint8_t bit_index  = ((_tag.scan() & 3) << 1);
+                                    uint8_t byte_index = (c << 2) + ((_tag.scan() & 4) >> 3);
+
+                                    // clear the bits
+                                    //
+                                    _onoff_channels[byte_index] &= ~(0x11 << bit_index);
+
+                                    // set the bits
+                                    //
+                                    if (channel_val >= SWITCH_THRESHOLD_10)
+                                    {
+                                        _onoff_channels[byte_index] |= (0x11 << bit_index);
+                                    }
+                                    else
+                                    if (channel_val >= SWITCH_THRESHOLD_01)
+                                    {
+                                        _onoff_channels[byte_index] |= (0x10 << bit_index);
+                                    }
+                                    else
+                                    if (channel_val >= SWITCH_THRESHOLD_00)
+                                    {
+                                        _onoff_channels[byte_index] |= (0x01 << bit_index);
+                                    }
+                                }
                             }
 
                             // Switch the active frame buffer

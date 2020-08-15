@@ -4,12 +4,11 @@
 #include <inttypes.h>
 
 #define SUB_MODULES            16
-#define DIGITAL_CHANNELS       40
+#define BASIC_CHANNELS_COUNT    4
+#define EXTRA_CHANNELS_COUNT   12
+#define ONOFF_CHANNELS_COUNT   48
 
 #define MAX_DELTA              0
-
-#define MANDATORY_CHANNELS     4
-#define EXPANSION_CHANNELS     12
 
 #define GUARD_US               25
 
@@ -24,9 +23,9 @@
 
 #define USEC_TO_WIDTH(us)      (us) // TODO
 
-#define DIGITAL_CHANNELS_BYTES (DIGITAL_CHANNELS >> 3)
-#define MIM_CHANNELS           MANDATORY_CHANNELS
-#define MAX_CHANNELS           ( MANDATORY_CHANNELS + EXPANSION_CHANNELS )
+#define ONOFF_CHANNELS_BYTES   (ONOFF_CHANNELS_COUNT >> 3)
+#define MIM_CHANNELS           BASIC_CHANNELS_COUNT
+#define MAX_CHANNELS           ( BASIC_CHANNELS_COUNT + EXTRA_CHANNELS_COUNT )
 
 #define MAX_PULSE_WIDTH_US     ( MIN_CHANNEL_WIDTH_US - MIN_PULSE_WIDTH_US - 2 * GUARD_US )
 

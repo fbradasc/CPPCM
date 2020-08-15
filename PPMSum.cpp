@@ -16,11 +16,11 @@
  *
  * Enable the input capture interrupt.
  */
-void TPPMSum::start(BasicChannels basic_channels,
-                    ExtraChannels extra_channels,
-                    OnOffChannels onoff_channels,
-                    uint16_t      default_servo_value,
-                    bool          default_onoff_value)
+void TPPMSum::init(BasicChannels basic_channels,
+                   ExtraChannels extra_channels,
+                   OnOffChannels onoff_channels,
+                   uint16_t      default_servo_value,
+                   bool          default_onoff_value)
 {
     for (uint8_t c=0; c<BASIC_CHANNELS_COUNT; ++c)
     {
@@ -34,7 +34,7 @@ void TPPMSum::start(BasicChannels basic_channels,
 
     for (uint8_t c=0; c<ONOFF_CHANNELS_BYTES; ++c)
     {
-        onoff_channels[c] = default_onoff_value;
+        onoff_channels[c] = (default_onoff_value) ? 0xff : 0x00;
     }
 
     // Define inputs: (interrupt pins)
@@ -102,18 +102,49 @@ void TPPMSum::stop(void)
 /**
  * Atomically read the current CPPCM channel values into the array pointed to by `values`.
  */
-void TPPMSum::read(int16_t *values)
+uint8_t TPPMSum::read(BasicChannels basic_channels,
+                      ExtraChannels extra_channels,
+                      OnOffChannels onoff_channels);
 {
     noInterrupts();
 
+    uint8_t retval = (_flags.entangled) ? _tag.rx_sub_id() : 0;
     uint8_t buffer = _flags.frame_buffer; // use failsafe buffer if needed
+    uint8_t bytes  = (_flags.entangled) ? ONOFF_CHANNELS_BYTES : 0;
+    uint8_t items  = max(BASIC_CHANNELS_COUNT,
+                         max(extra_channels(),
+                             bytes));
 
-    for (uint8_t i=0; i < channels(); ++i)
+    for (uint8_t i=0; i<items; ++i)
     {
-        values[i] = _channels[buffer][i];
+        if (i < BASIC_CHANNELS_COUNT)
+        {
+            basic_channels[i] = _raw_channels[buffer][i];
+        }
+
+        if (i < tppmsum.extra_channels())
+        {
+            // Use the extra_channels[i] value to:
+            //
+            if (_flags.entangled)
+            {
+                extra_channels[i] = _extra_channels[i];
+            }
+            else
+            {
+                extra_channels[i] = _raw_channels[buffer][i+BASIC_CHANNELS_COUNT];
+            }
+        }
+
+        if (i < bytes)
+        {
+            onoff_channels[i] = _onoff_channels[i];
+        }
     }
 
     interrupts();
+
+    return retval;
 }
 
 /**
