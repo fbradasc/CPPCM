@@ -1,2 +1,4 @@
 .*~
 .exvim*/
+*.sch-bak
+*_old
