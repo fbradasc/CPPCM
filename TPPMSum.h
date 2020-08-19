@@ -5,15 +5,15 @@
 
 // Number of consecutive good frames required at startup.
 //
-#define GOOD_FRAMES_COUNT 10
+#define GOOD_FRAMES_COUNT   10
 
 // Number of consecutive bad frames accepted without going to failsafe.
 //
-#define HOLD_FRAMES_COUNT 25
+#define HOLD_FRAMES_COUNT   25
 
-// Number of consecutive bad frames accepted without re-init the encoder.
+// Milliseconds without good frames before triggering the watchdog.
 //
-#define INIT_FRAMES_COUNT 50
+#define WATCHDOG_TIMEOUT_MS SEC_TO_MS(10)
 
 ISR(TIMER1_CAPT_vect);
 
@@ -27,6 +27,7 @@ public:
 
     TPPMSum()
         : _state(INIT_DECODE)
+        , _last_good_frame_time(millis())
     {
         _flags.fail_safe_mode   = 0;
         _flags.signature_buffer = 0;
@@ -63,6 +64,13 @@ public:
     uint8_t read(TPPM::BasicChannels basic_channels,
                  TPPM::ExtraChannels extra_channels,
                  TPPM::OnOffChannels onoff_channels);
+
+    // Returns true if no good frames received within the WATCHDOG_TIMEOUT_MS
+    //
+    inline bool timeout(void)
+    {
+        return ((_last_good_frame_time - millis()) >= WATCHDOG_TIMEOUT_MS);
+    }
 
     // Returns true if the decoder is capturing whole frames, either usable or not
     //
@@ -316,6 +324,7 @@ private:
 
         if (INIT_DECODE == _state)
         {
+            _last_good_frame_time  = millis();
             _flags.fail_safe_mode  = 1;
             _flags.pulse_level_set = 0;
             _flags.pulse_level     = HI_LEVEL;
@@ -379,16 +388,20 @@ private:
                     //
                     ++_good_frames;
 
+                    // Refresh the watchdog
+                    //
+                    _last_good_frame_time = millis();
+
                     if (SIGNATURE_REF_DATA == _flags.signature_buffer)
                     {
                         // This is the first good frame since decoder initialization
                         // Keep its data as reference for further frames checks
                         //
-                        _tag.entangle();
+                        _tag.connect();
 
                         _flags.signature_buffer = SIGNATURE_CUR_DATA;
 
-                        _flags.entangled = _tag.is_encoded();
+                        _flags.entangled = _tag.is_valid();
                     }
 
                     _dsr[_flags.signature_buffer][LO_LEVEL].reset();
@@ -443,7 +456,14 @@ private:
                         //
                         if (!_flags.entangled || (_tag.is_encoded() && _tag.is_valid()))
                         {
-                            // And it's for me - reset the hold frames counter
+                            // And it's for me...
+                            //
+
+                            // ...refresh the watchdog
+                            //
+                            _last_good_frame_time = millis();
+
+                            // ...and reset the hold frames counter...
                             //
                             _hold_frames = 0;
 
@@ -491,6 +511,16 @@ private:
                             //
                             // Freeze with the last good frame, maybe the transmitter is controlling another receiver.
                             //
+
+                            if (_tag.is_trusted())
+                            {
+                                // Refresh the watchdog
+                                //
+                                _last_good_frame_time = millis();
+                            }
+                            // else: an unentangled encoder is transmitting in the receiver's frequency
+                            //       do NOT refresh the watchdog!
+
                             // Reset the hold frames counter
                             //
                             _hold_frames = 0;

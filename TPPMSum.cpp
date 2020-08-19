@@ -18,7 +18,7 @@
  *
  * Enable the input capture interrupt.
  */
-void TPPMSum::init(const uint8_t rx_id         ,
+void TPPMSum::init(const uint8_t decoder_id        ,
                    BasicChannels basic_channels_out,
                    ExtraChannels extra_channels_out,
                    OnOffChannels onoff_channels_out,
@@ -27,7 +27,7 @@ void TPPMSum::init(const uint8_t rx_id         ,
 {
     // Set the receiver ID (my own id) for further comparisons
     //
-    _tag.set_rx_id(rx_id);
+    _tag.set_decoder_id(decoder_id);
 
     if (NULL != basic_channels_out)
     {
@@ -130,10 +130,9 @@ uint8_t TPPMSum::read(BasicChannels basic_channels_out,
 {
     noInterrupts();
 
-    uint8_t retval = (_flags.entangled) ? _tag.rx_sub_id() : 0;
+    uint8_t retval = (_flags.entangled) ? _tag.part_index() : 0;
 
-    uint8_t buffer = ( _flag.fail_safe_mode ) ? FAIL_SAFE_BUFFER
-                                              : _flags.frame_buffer;
+    uint8_t buffer = _flags.frame_buffer;
 
     uint8_t num_onoff_channles = (_flags.entangled) ? ONOFF_CHANNELS_BYTES : 0;
 
@@ -142,6 +141,11 @@ uint8_t TPPMSum::read(BasicChannels basic_channels_out,
     uint8_t num_total_channels = max(BASIC_CHANNELS_COUNT,
                                      max(num_extra_channels,
                                          num_onoff_channles));
+
+    if (_flags.fail_safe_mode || (timeout() && _flags.fail_safe_set))
+    {
+        buffer = FAIL_SAFE_BUFFER;
+    }
 
     for (uint8_t i=0; i<num_total_channels; ++i)
     {

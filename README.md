@@ -24,11 +24,11 @@ up to 16 channels (up to 17 pulses), followed by a sync gap.
         // Define here your own 4 bits receiver ID
         // or read it from the flash memory
         //
-        const uint8_t rx_id = 0; // [0..15]
+        const uint8_t decoder_id = 0; // [0..15]
 
         // Initialize the output buffers and start the decoder
         //
-        tppmsum.init(rx_id,
+        tppmsum.init(decoder_id,
                      basic_channels,
                      extra_channels,
                      onoff_channels,
@@ -38,11 +38,15 @@ up to 16 channels (up to 17 pulses), followed by a sync gap.
 
     void loop(void)
     {
-        if (tppmsum.capturing() /* && !tppmsum.initializing() */)
+        if (/* !tppmsum.timeout()
+            && */
+            tppmsum.capturing()
+            /* &&
+            !tppmsum.initializing() */)
         {
-            uint8_t sub_module = tppmsum.read(basic_channels,
-                                              extra_channels,
-                                              onoff_channels);
+            uint8_t module = tppmsum.read(basic_channels,
+                                          extra_channels,
+                                          onoff_channels);
 
             for (uint8_t c = 0; c < tppmsum.total_channels_count(); ++c)
             {
@@ -60,7 +64,7 @@ up to 16 channels (up to 17 pulses), followed by a sync gap.
                     //
                     if (tppmsum.entangled())
                     {
-                        // - drive the c-th control/servo of the sub_module-th sub module
+                        // - drive the c-th control/servo of the module-th sub module
                         //
                     }
                     else
@@ -74,7 +78,7 @@ up to 16 channels (up to 17 pulses), followed by a sync gap.
                 {
                     // Use the onoff_channels's c-th bit value to:
                     //
-                    // - switch ON/OFF the c-th function of the sub_module-th sub module
+                    // - switch ON/OFF the c-th function of the module-th sub module
                     //
                     if (TPPMSum::is_on(onoff_channels, c))
                     {

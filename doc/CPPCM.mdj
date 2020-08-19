@@ -2889,7 +2889,7 @@
 													"top": 381,
 													"width": 456.5302734375,
 													"height": 13,
-													"text": "do/[sync_detected && valid_sync_frame && frame_buffer==0]: signature.pair()",
+													"text": "do/[sync_detected && valid_sync_frame && frame_buffer==0]: signature.connect()",
 													"horizontalAlignment": 0
 												},
 												{
@@ -3361,7 +3361,7 @@
 											"_parent": {
 												"$ref": "AAAAAAFztKsbo5Igh+4="
 											},
-											"name": "[sync_detected && valid_sync_frame && frame_buffer==0]: signature.pair()"
+											"name": "[sync_detected && valid_sync_frame && frame_buffer==0]: signature.connect()"
 										},
 										{
 											"_type": "UMLActivity",

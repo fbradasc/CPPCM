@@ -34,28 +34,39 @@ class TPPMTag
 {
 public:
     TPPMTag()
-        : _rx_id        (0)
-        , _raw_bits     (0)
-        , _paired_tx_id (0)  // until paired all transmitters are valid
-        , _valid        (false)
-        , _encoded      (false)
+        ; _raw_bits  (0)
+        , _coupled_id(0)  // until coupled all transmitters are valid
+        , _encoder_id(0)
+        , _decoder_id(0)
+        , _part_index(0)
+        , _scan_index(0)
+        , _valid     (false)
+        , _trusted   (false)
+        , _encoded   (false)
     {}
 
     inline void reset()
     {
-        _raw_bits     = 0;
-        _paired_tx_id = 0;
-        _valid        = false;
-        _encoded      = false;
+        _raw_bits   = 0;
+        _coupled_id = 0;
+        _encoder_id = 0;
+        _decoder_id = 0;
+        _part_index = 0;
+        _scan_index = 0;
+        _valid      = false;
+        _trusted    = false;
+        _encoded    = false;
     }
 
-    inline void set_rx_id(const uint8_t &rx_id)
+    inline void set_decoder_id(const uint8_t &decoder_id)
     {
-        _rx_id = rx_id & 0x07;
+        _decoder_id = decoder_id & 0x07;
     }
 
     inline void update(const uint8_t &captures, const uint16_t &pulse_width)
     {
+        _trusted = false;
+
         if (captures <= MAX_SUPERINPOSED_CHANNELS)
         {
             // collect data
@@ -116,43 +127,43 @@ public:
             if (_encoded)
             {
                 // To ensure an unencoded PPM frame is not validated we check for
-                // even parity on the tx_id bits and for odd parity on the rx_id
+                // even parity on the encoder_id bits and for odd parity on the decoder_id
                 // and scan bis.
                 //
                 // In an unencoded PPM all the pulses shall have the same width
                 // thus the frame will fall in one of the following cases:
                 //
-                // _raw_bits        : 0000000000000000000000
-                // _tx_id           : 00000000 (expected even parity: 0)
-                // _rx_id+_rx_sub_id: 00000000 (expected odd  parity: 1)
-                // _scan_index      : 0000     (expected odd  parity: 1)
-                // tx_id_even_parity: 0 ->     parity match
-                // rx_id_odd_parity : 0 -> (E) parity does not match
-                // scan_odd_parity  : 0 -> (E) parity does not match
+                // _raw_bits              : 0000000000000000000000
+                // _encoder_id            : 00000000 (expected even parity: 0)
+                // _decoder_id+_part_index: 00000000 (expected odd  parity: 1)
+                // _scan_index            : 0000     (expected odd  parity: 1)
+                // leader_id_even_parity  : 0 ->     parity match
+                // main_index_odd_parity  : 0 -> (E) parity does not match
+                // scan_index_odd_parity  : 0 -> (E) parity does not match
                 // ------------------------------------------------------
-                // _raw_bits        : 0101010101010101010101
-                // _tx_id           : 00000000 (expected even parity: 0)
-                // _rx_id+_rx_sub_id: 11111111 (expected odd  parity: 1)
-                // _scan_index      : 000      (expected odd  parity: 1)
-                // tx_id_even_parity: 1 -> (E) parity does not match
-                // rx_id_odd_parity : 1 ->     parity match
-                // scan_odd_parity  : 1 ->     parity match
+                // _raw_bits              : 0101010101010101010101
+                // _encoder_id            : 00000000 (expected even parity: 0)
+                // _decoder_id+_part_index: 11111111 (expected odd  parity: 1)
+                // _scan_index            : 000      (expected odd  parity: 1)
+                // leader_id_even_parity  : 1 -> (E) parity does not match
+                // main_index_odd_parity  : 1 ->     parity match
+                // scan_index_odd_parity  : 1 ->     parity match
                 // ------------------------------------------------------
-                // _raw_bits        : 1010101010101010101010
-                // _tx_id           : 11111111 (expected even parity: 0)
-                // _rx_id+_rx_sub_id: 00000000 (expected odd  parity: 1)
-                // _scan_index      : 111      (expected odd  parity: 0)
-                // tx_id_even_parity: 0 ->     parity match
-                // rx_id_odd_parity : 0 -> (E) parity does not match
-                // scan_odd_parity  : 0 ->     parity match
+                // _raw_bits              : 1010101010101010101010
+                // _encoder_id            : 11111111 (expected even parity: 0)
+                // _decoder_id+_part_index: 00000000 (expected odd  parity: 1)
+                // _scan_index            : 111      (expected odd  parity: 0)
+                // leader_id_even_parity  : 0 ->     parity match
+                // main_index_odd_parity  : 0 -> (E) parity does not match
+                // scan_index_odd_parity  : 0 ->     parity match
                 // ------------------------------------------------------
-                // _raw_bits        : 1111111111111111111111
-                // _tx_id           : 11111111 (expected even parity: 0)
-                // _rx_id+_rx_sub_id: 11111111 (expected odd  parity: 1)
-                // _scan_index      : 111      (expected odd  parity: 0)
-                // tx_id_even_parity: 1 -> (E) parity does not match
-                // rx_id_odd_parity : 1 ->     parity match
-                // scan_odd_parity  : 1 -> (E) parity does not match
+                // _raw_bits              : 1111111111111111111111
+                // _encoder_id            : 11111111 (expected even parity: 0)
+                // _decoder_id+_part_index: 11111111 (expected odd  parity: 1)
+                // _scan_index            : 111      (expected odd  parity: 0)
+                // leader_id_even_parity  : 1 -> (E) parity does not match
+                // main_index_odd_parity  : 1 ->     parity match
+                // scan_index_odd_parity  : 1 -> (E) parity does not match
                 //
                 valid = !(BIT_VAL(_raw_bits, TX_ID_BIT_0          ) ^
                           BIT_VAL(_raw_bits, TX_ID_BIT_1          ) ^
@@ -181,41 +192,43 @@ public:
 
                 if (valid)
                 {
-                    uint8_t rx_id;
+                    _encoder_id = (BIT_VAL(_raw_bits, TX_ID_BIT_0) << 0) |
+                                  (BIT_VAL(_raw_bits, TX_ID_BIT_1) << 1) |
+                                  (BIT_VAL(_raw_bits, TX_ID_BIT_2) << 2) |
+                                  (BIT_VAL(_raw_bits, TX_ID_BIT_3) << 3) |
+                                  (BIT_VAL(_raw_bits, TX_ID_BIT_4) << 4) |
+                                  (BIT_VAL(_raw_bits, TX_ID_BIT_5) << 5) |
+                                  (BIT_VAL(_raw_bits, TX_ID_BIT_6) << 6) |
+                                  (BIT_VAL(_raw_bits, TX_ID_BIT_7) << 7) ;
 
-                    rx_id = (BIT_VAL(_raw_bits, RX_ID_BIT_0) << 0) |
-                            (BIT_VAL(_raw_bits, RX_ID_BIT_1) << 1) |
-                            (BIT_VAL(_raw_bits, RX_ID_BIT_2) << 2) |
-                            (BIT_VAL(_raw_bits, RX_ID_BIT_3) << 3) ;
-
-                    // It's really valid only if it is for me and ...
+                    // It's really valid only if it comes from the coupled tx,
+                    // if any, and...
                     //
-                    valid = ( rx_id == _rx_id );
+                    valid = (_coupled_id == 0) || (_encoder_id == _coupled_id);
+                }
+
+                _trusted = valid;
+
+                if (valid)
+                {
+                    uint8_t decoder_id;
+
+                    decoder_id = (BIT_VAL(_raw_bits, RX_ID_BIT_0) << 0) |
+                                 (BIT_VAL(_raw_bits, RX_ID_BIT_1) << 1) |
+                                 (BIT_VAL(_raw_bits, RX_ID_BIT_2) << 2) |
+                                 (BIT_VAL(_raw_bits, RX_ID_BIT_3) << 3) ;
+
+                    // ...it's really valid only if it is for me
+                    //
+                    valid = ( decoder_id == _decoder_id );
                 }
 
                 if (valid)
                 {
-                    _tx_id = (BIT_VAL(_raw_bits, TX_ID_BIT_0) << 0) |
-                             (BIT_VAL(_raw_bits, TX_ID_BIT_1) << 1) |
-                             (BIT_VAL(_raw_bits, TX_ID_BIT_2) << 2) |
-                             (BIT_VAL(_raw_bits, TX_ID_BIT_3) << 3) |
-                             (BIT_VAL(_raw_bits, TX_ID_BIT_4) << 4) |
-                             (BIT_VAL(_raw_bits, TX_ID_BIT_5) << 5) |
-                             (BIT_VAL(_raw_bits, TX_ID_BIT_6) << 6) |
-                             (BIT_VAL(_raw_bits, TX_ID_BIT_7) << 7) ;
-
-                    // ... it's really valid only if it comes from the paired tx,
-                    // if any
-                    //
-                    valid = (_paired_tx_id == 0) || (_tx_id == _paired_tx_id);
-                }
-
-                if (valid)
-                {
-                    _rx_sub_id = (BIT_VAL(_raw_bits, RX_SUB_ID_BIT_0) << 0) |
-                                 (BIT_VAL(_raw_bits, RX_SUB_ID_BIT_1) << 1) |
-                                 (BIT_VAL(_raw_bits, RX_SUB_ID_BIT_2) << 2) |
-                                 (BIT_VAL(_raw_bits, RX_SUB_ID_BIT_3) << 3) ;
+                    _part_index = (BIT_VAL(_raw_bits, RX_SUB_ID_BIT_0) << 0) |
+                                  (BIT_VAL(_raw_bits, RX_SUB_ID_BIT_1) << 1) |
+                                  (BIT_VAL(_raw_bits, RX_SUB_ID_BIT_2) << 2) |
+                                  (BIT_VAL(_raw_bits, RX_SUB_ID_BIT_3) << 3) ;
 
                     _scan_index = (BIT_VAL(_raw_bits, SCAN_BIT_0) << 0) |
                                   (BIT_VAL(_raw_bits, SCAN_BIT_2) << 1) |
@@ -231,11 +244,12 @@ public:
             //
             _raw_bits = 0;
             _valid    = false;
+            _trusted  = false;
             _encoded  = false;
         }
     }
 
-    inline void decode(TPPM::BasicChannels raw_channels_in,
+    inline void decode(TPPM::BasicChannels raw_channels_in   ,
                        TPPM::ExtraChannels extra_channels_out,
                        TPPM::OnOffChannels onoff_channels_out)
     {
@@ -331,11 +345,11 @@ public:
         }
     }
 
-    inline void entangle()
+    inline void connect()
     {
         if (_valid)
         {
-            _paired_tx_id = _tx_id;
+            _coupled_id = _encoder_id;
         }
     }
 
@@ -344,19 +358,24 @@ public:
         return _valid;
     }
 
+    inline bool is_trusted()
+    {
+        return _trusted;
+    }
+
     inline bool is_encoded()
     {
         return _encoded;
     }
 
-    inline uint8_t tx_id()
+    inline uint8_t encoder_id()
     {
-        return _tx_id;
+        return _encoder_id;
     }
 
-    inline uint8_t rx_sub_id()
+    inline uint8_t part_index()
     {
-        return _rx_sub_id;
+        return _part_index;
     }
 
     inline uint8_t scan_index()
@@ -365,14 +384,15 @@ public:
     }
 
 private:
-    uint8_t  _rx_id;
-    uint32_t _raw_bits;
-    uint8_t  _paired_tx_id;
-    uint8_t  _tx_id;
-    uint8_t  _rx_sub_id;
+    uint32_t _raw_bits  ;
+    uint8_t  _coupled_id;
+    uint8_t  _encoder_id;
+    uint8_t  _decoder_id;
+    uint8_t  _part_index;
     uint8_t  _scan_index;
-    bool     _valid;
-    bool     _encoded;
+    bool     _valid     ;
+    bool     _trusted   ;
+    bool     _encoded   ;
 
     enum CodeBits
     {

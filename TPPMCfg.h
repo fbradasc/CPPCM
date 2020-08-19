@@ -21,6 +21,9 @@
 
 #define USEC_TO_WIDTH(us)      (us) // TODO
 
+#define SEC_TO_MS(s)           ((s)*1000)
+#define MS_TO_USEC(ms)         ((ms)*1000)
+
 #define ONOFF_CHANNELS_BYTES   (ONOFF_CHANNELS_COUNT >> 3)
 #define MIM_CHANNELS           BASIC_CHANNELS_COUNT
 #define MAX_CHANNELS           ( BASIC_CHANNELS_COUNT + EXTRA_CHANNELS_COUNT )
