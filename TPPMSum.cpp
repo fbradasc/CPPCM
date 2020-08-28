@@ -1,7 +1,9 @@
 #include <Arduino.h>
 #include <avr/io.h>
 
-#include "TPPSum.h"
+#include "TPPSum.hpp"
+
+using namespace TPPM;
 
 // Input capture pin 1
 //

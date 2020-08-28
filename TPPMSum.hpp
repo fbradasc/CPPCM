@@ -1,7 +1,7 @@
 #if !defined(__TPPM_SUM_H__)
 #define __TPPM_SUM_H__
 
-#include "TPPMTag.h"
+#include "TPPMTag.hpp"
 
 // Number of consecutive good frames required at startup.
 //

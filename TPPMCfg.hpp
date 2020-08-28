@@ -2,11 +2,14 @@
 #define __TPPM_CFG_H__
 
 #include <inttypes.h>
+#include <algorithm>
+
+using namespace std;
 
 #define SUB_MODULES            16
 #define BASIC_CHANNELS_COUNT    4
 #define EXTRA_CHANNELS_COUNT   12
-#define ONOFF_CHANNELS_COUNT   48
+#define ONOFF_CHANNELS_COUNT   32
 
 #define MAX_DELTA              0
 
@@ -24,7 +27,7 @@
 #define SEC_TO_MS(s)           ((s)*1000)
 #define MS_TO_USEC(ms)         ((ms)*1000)
 
-#define ONOFF_CHANNELS_BYTES   (ONOFF_CHANNELS_COUNT >> 3)
+#define ONOFF_CHANNELS_BYTES   ( ONOFF_CHANNELS_COUNT >> 3 )
 #define MIM_CHANNELS           BASIC_CHANNELS_COUNT
 #define MAX_CHANNELS           ( BASIC_CHANNELS_COUNT + EXTRA_CHANNELS_COUNT )
 
@@ -55,9 +58,9 @@
 
 namespace TPPM
 {
-    typedef uint16_t[BASIC_CHANNELS_COUNT] BasicChannels;
-    typedef uint16_t[EXTRA_CHANNELS_COUNT] ExtraChannels;
-    typedef uint8_t [ONOFF_CHANNELS_BYTES] OnOffChannels;
-};
+    typedef uint16_t BasicChannels[BASIC_CHANNELS_COUNT];
+    typedef uint16_t ExtraChannels[EXTRA_CHANNELS_COUNT];
+    typedef uint8_t  OnOffChannels[ONOFF_CHANNELS_BYTES];
+}
 
 #endif // __TPPM_CFG_H__
